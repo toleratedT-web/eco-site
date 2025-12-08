@@ -10,14 +10,49 @@
 </head>
 <body>
     <div class="wrapper"> <!-- Flex wrapper to manage layout -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <!-- Navbar content -->
-            <div class="container-fluid">
-                <a class="navbar-brand me-auto" href="#">Rolsa Technologies</a>
-                <a class="navbar-brand me-auto" href=" "></a>
-                <a class="navbar-brand me-auto" href=" "></a>
-            </div>
-        </nav>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+  <div class="container-fluid">
+
+    <!-- Brand on the LEFT -->
+    <a class="navbar-brand fw-bold" href="#">Rolsa Technologies</a>
+
+    <!-- Mobile Toggle Button -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#rolsaNavbar"
+      aria-controls="rolsaNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Navbar Links -->
+    <div class="collapse navbar-collapse" id="rolsaNavbar">
+
+      <!-- Left Links -->
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Green Products</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Carbon Calculator</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Book a Consultation</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Energy Tracker</a>
+        </li>
+      </ul>
+
+      <!-- Right Side (Account) -->
+      <div class="d-flex">
+        <a href="#" class="btn btn-outline-light me-2">Login</a>
+        <a href="#" class="btn btn-light text-success">Register</a>
+      </div>
+
+    </div>
+  </div>
+</nav>
 
         <!-- Main Content -->
         <div class="content">
