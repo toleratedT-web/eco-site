@@ -1,2 +1,2 @@
 # eco-site
-like is pi
+life is pi
