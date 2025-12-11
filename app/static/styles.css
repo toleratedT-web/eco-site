@@ -1,0 +1,38 @@
+.container-fluid-hero {
+    position: relative;
+    width: 100%;
+    height: 55vh; /* Adjust height as desired */
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #e8f5e9; /* subtle eco-tint fallback */
+}
+ 
+/* Hero Image */
+.container-fluid-hero .hero-element {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* Makes it crop elegantly */
+    object-position: center;
+    filter: brightness(0.85); /* Slight darkening for depth */
+    border-radius: 0 0 18px 18px; /* Gentle lower curve */
+    transition: transform 6s ease, filter 1s ease;
+}
+ 
+/* Optional Slow Parallax-like Drift */
+.container-fluid-hero:hover .hero-element {
+    transform: scale(1.08);
+    filter: brightness(0.92);
+}
+ 
+/* Optional subtle shadow under hero */
+.container-fluid-hero::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    width: 100%;
+    height: 20px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
+}
+ 
