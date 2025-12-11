@@ -6,6 +6,3 @@ bp = Blueprint('main', __name__)
 def index():
     return render_template('home.html')
 
-@bp.route('/privacy')
-def privacy():
-    return render_template('privacy.html')
