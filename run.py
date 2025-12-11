@@ -1,5 +1,4 @@
-from app import create_app  # Import the factory function that creates the app
-from extensions import db
+from app  # Import the factory function that creates the app
 from app.models import User
 
 import sys
@@ -16,7 +15,6 @@ else:  # Running normally
     app = Flask(__name__, template_folder='templates', static_folder='static')
 
 app = create_app()  # Create the Flask app instance
-
 
 if __name__ == "__main__":
     with app.app_context():
