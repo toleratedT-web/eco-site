@@ -1,11 +1,19 @@
 from flask import render_template, Flask, request, session, redirect, url_for
 from forms import FootprintForm
+from flask_login import login_required, current_user
 
 app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    # Your existing home page
+    return render_template("home.html")
+
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    return render_template("dashboard.html", user=current_user)
+
 
 @app.route('/calculate')
 def calculate():
