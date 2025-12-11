@@ -1,4 +1,6 @@
 from app import create_app  # Import the factory function that creates the app
+from extensions import db
+from app.models import User
 
 import sys
 import os

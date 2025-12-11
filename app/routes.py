@@ -1,11 +1,14 @@
 from flask import Blueprint, render_template
+from flask_login import login_required, current_user
 
-bp = Blueprint('main', __name__)
+main_bp = Blueprint("main", __name__)
 
-@bp.route('/')
-def index():
-    return render_template('home.html')
+@main_bp.route("/")
+def home():
+    # Your existing home page
+    return render_template("home.html")
 
-@bp.route('/privacy')
-def privacy():
-    return render_template('privacy.html')
+@main_bp.route("/dashboard")
+@login_required
+def dashboard():
+    return render_template("dashboard.html", user=current_user)
