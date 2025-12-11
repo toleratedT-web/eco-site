@@ -14,7 +14,12 @@
   <div class="container-fluid">
 
     <!-- Brand on the LEFT -->
-    <img src="static/images/logo.png" alt="Rolsa Technologies Logo" width="200">
+    <a href="{{ url_for('main.index') }}">
+    <img src="{{ url_for('static', filename='images/logo.png') }}" 
+         alt="Rolsa Technologies Logo" 
+         width="200">
+    </a>
+
 
     <!-- Mobile Toggle Button -->
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#rolsaNavbar"
@@ -60,8 +65,14 @@
         </div>
 
         <!-- Footer -->
-        <footer class="bg-dark text-white text-center py-3 mt-5">
-            <p>&copy; 2025 Rolsa Technologies. All rights reserved.</p>
+        <footer class="bg-dark text-white text-center py-2 mt-5" style="font-size: 0.9rem;">
+            <div class="container">
+                <span>&copy; 2025 Rolsa Technologies</span>
+                <span class="mx-2">|</span>
+                <a href="{{ url_for('main.privacy') }}" class="text-decoration-none text-light">
+                    Privacy & Cookies
+                </a>
+            </div>
         </footer>
     </div>
 
