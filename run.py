@@ -17,5 +17,9 @@ else:  # Running normally
 
 app = create_app()  # Create the Flask app instance
 
-if __name__ == '__main__':  # Ensure the app only runs if this file is executed directly
-    app.run(debug=True)  # Run the app in debug mode for easier debugging
+
+if __name__ == "__main__":
+    with app.app_context():
+        # For first local run on SQLite; afterwards use Flask-Migrate
+        db.create_all()
+    app.run(debug=True)
