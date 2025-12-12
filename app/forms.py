@@ -6,8 +6,8 @@ from app import db
 from app.models import User
 
 class FootprintForm(FlaskForm):
-    car_emission = FloatField("Car Emission", validators=[InputRequired])
-    electricity_usage = FloatField("Electricity Usage", validators=[InputRequired])
+    car_emission = FloatField("Car Emission", validators=[InputRequired()])  # Corrected here
+    electricity_usage = FloatField("Electricity Usage", validators=[InputRequired()])  # Corrected here
     submit = SubmitField("Submit")
 
 class RegistrationForm(FlaskForm):
