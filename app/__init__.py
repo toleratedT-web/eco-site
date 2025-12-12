@@ -1,39 +1,27 @@
-
-# app/__init__.py
-import os
 from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+from flask_login import LoginManager
 from config import Config
-from extensions import db, login_manager, migrate
 
-def create_app(config_class=Config):
-    app = Flask(
-        __name__,
-        instance_relative_config=True,
-        static_folder="static",
-        template_folder="templates"
-    )
-    app.config.from_object(config_class)
+# Initialize extensions globally
+db = SQLAlchemy()
+migrate = Migrate()
+login = LoginManager()
 
-    # Ensure instance folder exists for SQLite
-    os.makedirs(app.instance_path, exist_ok=True)
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
 
-    # --- Initialize extensions (order matters, but this is fine) ---
+    # Initialize extensions with the app
     db.init_app(app)
     migrate.init_app(app, db)
-    login_manager.init_app(app)               # <-- Must succeed
-    login_manager.login_view = "auth.login"
-    login_manager.login_message_category = "warning"
+    login.init_app(app)
 
-    # --- Register blueprints ---
-    from .routes import main_bp
-    app.register_blueprint(main_bp)
+    login.login_view = 'login'  # Define the login route for Flask-Login
 
-    from .auth_routes import auth_bp
-    app.register_blueprint(auth_bp, url_prefix="/auth")
+    # Register routes here after initializing the app
+    from app.routes import init_routes
+    init_routes(app)
 
-    # --- Register user loader (lazy import to avoid circular deps) ---
-    @login_manager.user_loader
-    def load_user(user_id: str):
-        from .models import User
-        return db.session.get(User, int(user_id))
-
+    return app

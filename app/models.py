@@ -1,25 +1,28 @@
-
-# app/models.py
-from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
-from extensions import db
+from typing import Optional
+from app import db, login  # Remove 'app' import, only import 'db' and 'login'
+import sqlalchemy as sa
+import sqlalchemy.orm as so
 
 class User(UserMixin, db.Model):
-    __tablename__ = "users"
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
+    email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True, unique=True)
+    password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
 
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(255), unique=True, index=True, nullable=False)
-    username = db.Column(db.String(64), unique=True, index=True, nullable=False)
-    password_hash = db.Column(db.String(256), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def set_password(self, password: str):
+    def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
-    def check_password(self, password: str) -> bool:
+    def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+<<<<<<< HEAD
 @login_manager.user_loader
 def load_user(id):
     return User.query.get(int(id))
+=======
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
+>>>>>>> 892347235bdfce08479b2deb0078cc8345787371

@@ -1,27 +1,12 @@
+{% extends 'base.html' %}
+{% import "bootstrap_wtf.html" as wtf %}
 
-{% extends "base.html" %}
-{% block title %}Login{% endblock %}
 {% block content %}
-<h2>Sign in</h2>
-<form method="post">
-  {{ form.hidden_tag() }}
-
-  <label>
-    {{ form.email_or_username.label }}
-    {{ form.email_or_username(size=32) }}
-  </label>
-  {% for e in form.email_or_username.errors %}<div class="error">{{ e }}</div>{% endfor %}
-
-  <label>
-    {{ form.password.label }}
-    {{ form.password(size=32) }}
-  </label>
-  {% for e in form.password.errors %}<div class="error">{{ e }}</div>{% endfor %}
-
-  <label>
-    {{ form.remember() }} {{ form.remember.label }}
-  </label>
-
-  {{ form.submit(class_="button") }}
-</form>
+    <h1>Sign In</h1>
+    {{ wtf.quick_form(form) }}
+    <p>New User? <a href="{{ url_for('register') }}">Click to Register!</a></p>
+    <p>
+        Forgot Your Password?
+        <a href="{{ url_for('dashboud') }}">Click to Reset It</a>
+    </p>
 {% endblock %}
