@@ -1,7 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from typing import Optional
-from app import db, login  # Remove 'app' import, only import 'db' and 'login'
+from app import db, login
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 
