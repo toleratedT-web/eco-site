@@ -17,12 +17,9 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-<<<<<<< HEAD
-@login_manager.user_loader
-def load_user(id):
-    return User.query.get(int(id))
-=======
+
+
 @login.user_loader
 def load_user(id):
     return db.session.get(User, int(id))
->>>>>>> 892347235bdfce08479b2deb0078cc8345787371
+
