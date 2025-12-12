@@ -36,3 +36,88 @@
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
 }
  
+/* General Form Styling */
+form {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+label {
+    font-size: 1rem;
+    font-weight: bold;
+    color: #333;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* Input Fields */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #4CAF50;
+    outline: none;
+}
+
+/* Invalid Feedback Styling */
+.invalid-feedback {
+    color: #f44336;
+    font-size: 0.875rem;
+    margin-top: 5px;
+}
+
+/* Error states */
+input.is-invalid,
+textarea.is-invalid,
+select.is-invalid {
+    border-color: #f44336;
+}
+
+input.is-valid,
+textarea.is-valid,
+select.is-valid {
+    border-color: #4CAF50;
+}
+
+/* Button Styling (if there is a submit button in the form) */
+button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 1rem;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+button[type="submit"]:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+/* For hidden inputs, you may want to hide them visually but still have them in the DOM */
+input[type="hidden"] {
+    display: none;
+}
