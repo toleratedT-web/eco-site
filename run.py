@@ -1,4 +1,4 @@
-from app  # Import the factory function that creates the app
+from app import create_app, db
 from app.models import User
 
 import sys
