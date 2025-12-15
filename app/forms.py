@@ -2,10 +2,16 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, InputRequired
 from wtforms.fields import DateField, TimeField, TextAreaField
-from wtforms.validators import Length
+from wtforms.validators import Length, DataRequired
 import sqlalchemy as sa
 from app import db
 from app.models import User
+
+class LoginForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember = BooleanField('Remember me')
+    submit = SubmitField('Sign In')
 
 class FootprintForm(FlaskForm):
     car_emission = FloatField("Car Emission", validators=[InputRequired()])  # Corrected here

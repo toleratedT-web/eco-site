@@ -4,42 +4,48 @@
 {% block content %}
 <h1>Green Products</h1>
 
-<ul>
+<ul class="category-tabs">
     <li onclick="showContent('solar')">Solar Panels</li>
     <li onclick="showContent('ev')">EV Chargers</li>
     <li onclick="showContent('appliances')">Smart Home Appliances</li>
 </ul>
 
 <!-- Solar Products -->
-<div id="solar" class="content_dis">
+<div id="solar" class="content_dis product-grid">
     {% for product in solar_products %}
+    <div class="product-card">
+        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}">
         <h3>{{ product.name }}</h3>
-        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}" width="300">
         <p>{{ product.description }}</p>
-        <p>£{{ product.price }}</p>
-        <hr>
+        <p class="price">£{{ product.price }}</p>
+        <button class="btn-add">Add to Basket</button>
+    </div>
     {% endfor %}
 </div>
 
 <!-- EV Products -->
-<div id="ev" class="content_dis">
+<div id="ev" class="content_dis product-grid">
     {% for product in ev_products %}
+    <div class="product-card">
+        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}">
         <h3>{{ product.name }}</h3>
-        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}" width="300">
         <p>{{ product.description }}</p>
-        <p>£{{ product.price }}</p>
-        <hr>
+        <p class="price">£{{ product.price }}</p>
+        <button class="btn-add">Add to Basket</button>
+    </div>
     {% endfor %}
 </div>
 
 <!-- Appliances Products -->
-<div id="appliances" class="content_dis">
+<div id="appliances" class="content_dis product-grid">
     {% for product in appliance_products %}
+    <div class="product-card">
+        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}">
         <h3>{{ product.name }}</h3>
-        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}" width="300">
         <p>{{ product.description }}</p>
-        <p>£{{ product.price }}</p>
-        <hr>
+        <p class="price">£{{ product.price }}</p>
+        <button class="btn-add">Add to Basket</button>
+    </div>
     {% endfor %}
 </div>
 {% endblock %}
@@ -49,7 +55,7 @@
 window.showContent = function(id) {
     document.querySelectorAll('.content_dis').forEach(div => div.style.display = 'none');
     const selected = document.getElementById(id);
-    if (selected) selected.style.display = 'block';
+    if (selected) selected.style.display = 'grid'; // use grid for layout
 }
 </script>
 {% endblock %}
