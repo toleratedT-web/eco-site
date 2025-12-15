@@ -58,6 +58,11 @@ def init_routes(app):  # Define a function to register the routes
             return redirect(url_for('login'))
         return render_template('register.html', title='Register', form=form)
 
+    @app.route('/reset_password', methods=['GET', 'POST'])
+    def reset_password():
+        # Simple placeholder page for password resets. Implement email flow as needed.
+        return render_template('reset_password.html', title='Reset Password')
+
     @app.route('/calculate', methods=["GET", "POST"])
     def calculate():
         form = FootprintForm()
