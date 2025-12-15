@@ -12,3 +12,5 @@ if __name__ == "__main__":
         # For first local run on SQLite; afterwards use Flask-Migrate
         db.create_all()  # Create all database tables
     app.run(debug=True)  # Run the app
+
+    

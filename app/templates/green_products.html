@@ -2,13 +2,54 @@
 {% block title %}Green Products{% endblock %}
 
 {% block content %}
-    <h1>Green Products</h1>
-    <p>Explore our selection of eco-friendly products designed to help you reduce your carbon footprint and live a more sustainable lifestyle.</p>
-    <ul>
-        <li>Solar-Powered Chargers</li>
-        <li>Reusable Water Bottles</li>
-        <li>Energy-Efficient Light Bulbs</li>
-        <li>Biodegradable Cleaning Products</li>
-        <li>Eco-Friendly Clothing</li>
-    </ul>
+<h1>Green Products</h1>
+
+<ul>
+    <li onclick="showContent('solar')">Solar Panels</li>
+    <li onclick="showContent('ev')">EV Chargers</li>
+    <li onclick="showContent('appliances')">Smart Home Appliances</li>
+</ul>
+
+<!-- Solar Products -->
+<div id="solar" class="content_dis">
+    {% for product in solar_products %}
+        <h3>{{ product.name }}</h3>
+        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}" width="300">
+        <p>{{ product.description }}</p>
+        <p>£{{ product.price }}</p>
+        <hr>
+    {% endfor %}
+</div>
+
+<!-- EV Products -->
+<div id="ev" class="content_dis">
+    {% for product in ev_products %}
+        <h3>{{ product.name }}</h3>
+        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}" width="300">
+        <p>{{ product.description }}</p>
+        <p>£{{ product.price }}</p>
+        <hr>
+    {% endfor %}
+</div>
+
+<!-- Appliances Products -->
+<div id="appliances" class="content_dis">
+    {% for product in appliance_products %}
+        <h3>{{ product.name }}</h3>
+        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}" width="300">
+        <p>{{ product.description }}</p>
+        <p>£{{ product.price }}</p>
+        <hr>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+window.showContent = function(id) {
+    document.querySelectorAll('.content_dis').forEach(div => div.style.display = 'none');
+    const selected = document.getElementById(id);
+    if (selected) selected.style.display = 'block';
+}
+</script>
 {% endblock %}
