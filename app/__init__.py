@@ -18,10 +18,10 @@ def create_app():
     migrate.init_app(app, db)
     login.init_app(app)
 
-    login.login_view = 'login'  # Define the login route for Flask-Login
+    login.login_view = 'main.login_route'  # Define the login route for Flask-Login
 
-    # Register routes here after initializing the app
-    from app.routes import init_routes
-    init_routes(app)
+    # Register blueprint routes after initializing the app
+    from app.routes import bp as routes_bp
+    app.register_blueprint(routes_bp)
 
     return app

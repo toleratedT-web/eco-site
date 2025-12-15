@@ -15,7 +15,7 @@
 
     <!-- Brand on the LEFT -->
 
-    <a href="{{ url_for('home') }}">
+    <a href="{{ url_for('main.home') }}">
     <img src="{{ url_for('static', filename='images/logo.png') }}" 
          alt="Rolsa Technologies Logo" 
          width="200">
@@ -36,13 +36,13 @@
       <!-- Left Links -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" href="#">Home</a>
+          <a class="nav-link active" href="{{ url_for('main.home') }}">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Green Products</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('calculate') }}">Carbon Calculator</a>
+          <a class="nav-link" href="{{ url_for('main.calculate') }}">Carbon Calculator</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Book a Consultation</a>
@@ -55,11 +55,11 @@
       <!-- Right Side (Account) -->
       <div class="d-flex">
         {% if current_user.is_anonymous %}
-        <a href="{{ url_for('login') }}" class="btn btn-outline-light me-2">Login</a>
+        <a href="{{ url_for('main.login_route') }}" class="btn btn-outline-light me-2">Login</a>
         
-        <a href="{{ url_for('register') }}" class="btn btn-light text-success">Register</a>
+        <a href="{{ url_for('main.register') }}" class="btn btn-light text-success">Register</a>
         {% else %}
-        <a href ="{{ url_for('logout') }}" class="btn btn-outline-light me-2">Logout</a>
+        <a href ="{{ url_for('main.logout_route') }}" class="btn btn-outline-light me-2">Logout</a>
         {% endif %}
       </div>
 
