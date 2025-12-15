@@ -4,7 +4,7 @@ from app import db, login
 from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
-from app.models import User, Booking
+from app.models import User, Booking, Product
 import datetime
 
 # Blueprint for routes
@@ -20,9 +20,17 @@ def load_user(id):
 def home():
     return render_template('home.html')
 
-@bp.route('/green_products')
+@bp.route('/green-products')
 def green_products():
-    return render_template('green_products.html')
+    solar_products = Product.query.filter_by(category="solar").all()
+    ev_products = Product.query.filter_by(category="ev").all()
+    appliance_products = Product.query.filter_by(category="appliances").all()
+    return render_template(
+        'green_products.html', 
+        solar_products=solar_products, 
+        ev_products=ev_products,
+        appliance_products=appliance_products
+    )
 
 @bp.route('/consultation', methods=['GET', 'POST'])
 def consultation():
