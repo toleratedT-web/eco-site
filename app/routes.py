@@ -19,6 +19,18 @@ def load_user(id):
 def home():
     return render_template('home.html')
 
+@bp.route('/green_products')
+def green_products():
+    return render_template('green_products.html')
+
+@bp.route('/consultation')
+def consultation():
+    return render_template('consultation.html')
+
+@bp.route('/energy_tracker')
+def energy_tracker():
+    return render_template('energy_tracker.html')
+
 
 @bp.route('/dashboard')
 @login_required
