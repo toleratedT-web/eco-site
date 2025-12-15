@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+  <h1>Admin Dashboard</h1>
+  <p>Total bookings: {{ total }}</p>
+  <p>Upcoming: {{ upcoming }}</p>
+  <p>Past: {{ past }}</p>
+
+  <h2>Recent bookings</h2>
+  <ul>
+    {% for b in recent %}
+      <li>{{ b.name }} — {{ b.email }} — {% if b.appointment_datetime %}{{ b.appointment_datetime.strftime('%Y-%m-%d %H:%M') }}{% else %}pending{% endif %}</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

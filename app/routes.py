@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request, session
+from flask import Blueprint, render_template, flash, redirect, url_for, request, session, abort
 from urllib.parse import urlsplit
 from app import db, login
 from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm
@@ -121,3 +121,36 @@ def calculate():
                            submitted_car_emission=submitted_car_emission,
                            submitted_electricity_usage=submitted_electricity_usage,
                            submitted_total=submitted_total)
+
+@bp.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user and user.check_password(form.password.data) and user.is_admin:
+            login_user(user, remember=form.remember_me.data)
+            return redirect(url_for('admin_dashboard'))
+        flash('Invalid admin credentials', 'danger')
+    return render_template('admin_login.html', form=form)
+
+@bp.route('/admin/logout')
+@login_required
+def admin_logout():
+    logout_user()
+    return redirect(url_for('admin_login'))
+
+@bp.route('/admin/dashboard')
+@login_required
+def admin_dashboard():
+    if not current_user.is_admin:
+        abort(403)
+    total_bookings = Booking.query.count()
+    upcoming_bookings = Booking.query.filter(Booking.appointment_datetime >= datetime.utcnow()).count()
+    past_bookings = total_bookings - upcoming_bookings
+    recent = Booking.query.order_by(Booking.id.desc()).limit(10).all()
+    # add any other analytics queries (group by month, source, etc.)
+    return render_template('admin_dashboard.html',
+                           total=total_bookings,
+                           upcoming=upcoming_bookings,
+                           past=past_bookings,
+                           recent=recent)
