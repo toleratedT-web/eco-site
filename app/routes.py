@@ -1,10 +1,11 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request, session
 from urllib.parse import urlsplit
 from app import db, login
-from app.forms import LoginForm, RegistrationForm, FootprintForm
+from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
-from app.models import User
+from app.models import User, Booking
+import datetime
 
 # Blueprint for routes
 bp = Blueprint('main', __name__)
@@ -23,9 +24,25 @@ def home():
 def green_products():
     return render_template('green_products.html')
 
-@bp.route('/consultation')
+@bp.route('/consultation', methods=['GET', 'POST'])
 def consultation():
-    return render_template('consultation.html')
+    form = BookingForm()
+    if form.validate_on_submit():
+        appointment_dt = datetime.datetime.combine(form.date.data, form.time.data)
+        booking = Booking(
+            user_id=current_user.id if current_user.is_authenticated else None,
+            name=form.name.data,
+            email=form.email.data,
+            appointment_datetime=appointment_dt,
+            notes=form.notes.data,
+        )
+        db.session.add(booking)
+        db.session.commit()
+        flash('Your booking request has been submitted. We will contact you to confirm.')
+        return redirect(url_for('main.consultation'))
+
+    bookings = db.session.scalars(sa.select(Booking).order_by(Booking.appointment_datetime.desc())).all()
+    return render_template('consultation.html', form=form, bookings=bookings)
 
 @bp.route('/energy_tracker')
 def energy_tracker():

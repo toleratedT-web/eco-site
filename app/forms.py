@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, InputRequired
+from wtforms.fields import DateField, TimeField, TextAreaField
+from wtforms.validators import Length
 import sqlalchemy as sa
 from app import db
 from app.models import User
@@ -34,3 +36,12 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
+
+
+class BookingForm(FlaskForm):
+    name = StringField('Full Name', validators=[DataRequired(), Length(max=120)])
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=120)])
+    date = DateField('Preferred Date', validators=[DataRequired()], format='%Y-%m-%d')
+    time = TimeField('Preferred Time', validators=[DataRequired()])
+    notes = TextAreaField('Notes (optional)', validators=[Length(max=1000)])
+    submit = SubmitField('Request Booking')

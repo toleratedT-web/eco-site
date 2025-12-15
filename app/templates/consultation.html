@@ -4,10 +4,62 @@
 {% block content %}
     <h1>Book a Consultation</h1>
     <p>Schedule a personalized consultation with our sustainability experts to discuss how you can reduce your carbon footprint and implement eco-friendly practices in your daily life or business.</p>
-    <ul>
-        <li>One-on-One Consultations</li>
-        <li>Business Sustainability Audits</li>
-        <li>Customized Action Plans</li>
-        <li>Follow-Up Support</li>
-    </ul>
+
+    <div class="booking-form">
+        <h2>Request a Booking</h2>
+        <form method="post">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.name.label }}<br>
+                {{ form.name(size=40) }}
+                {% for err in form.name.errors %}<div class="error">{{ err }}</div>{% endfor %}
+            </div>
+            <div>
+                {{ form.email.label }}<br>
+                {{ form.email(size=40) }}
+                {% for err in form.email.errors %}<div class="error">{{ err }}</div>{% endfor %}
+            </div>
+            <div>
+                {{ form.date.label }}<br>
+                {{ form.date() }}
+                {% for err in form.date.errors %}<div class="error">{{ err }}</div>{% endfor %}
+            </div>
+            <div>
+                {{ form.time.label }}<br>
+                {{ form.time() }}
+                {% for err in form.time.errors %}<div class="error">{{ err }}</div>{% endfor %}
+            </div>
+            <div>
+                {{ form.notes.label }}<br>
+                {{ form.notes(rows=4, cols=50) }}
+                {% for err in form.notes.errors %}<div class="error">{{ err }}</div>{% endfor %}
+            </div>
+            <div>
+                {{ form.submit(class_='btn btn-primary') }}
+            </div>
+        </form>
+    </div>
+
+    <hr>
+
+    <div class="bookings-list">
+        <h2>Requested Bookings</h2>
+        {% if bookings and bookings|length > 0 %}
+            <ul>
+            {% for b in bookings %}
+                <li>
+                    <strong>{{ b.name }}</strong> — {{ b.email }} —
+                    {% if b.appointment_datetime %}
+                        {{ b.appointment_datetime.strftime('%Y-%m-%d %H:%M') }}
+                    {% else %}
+                        Date/time pending
+                    {% endif %}
+                    {% if b.notes %}<br>Notes: {{ b.notes }}{% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No bookings yet.</p>
+        {% endif %}
+    </div>
 {% endblock %}

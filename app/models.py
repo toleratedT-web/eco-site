@@ -21,3 +21,17 @@ class User(UserMixin, db.Model):
 def load_user(id):
     return db.session.get(User, int(id))
 
+
+class Booking(db.Model):
+    __tablename__ = 'booking'
+    id: so.Mapped[int] = so.mapped_column(primary_key=True)
+    user_id: so.Mapped[Optional[int]] = so.mapped_column(sa.Integer, sa.ForeignKey('user.id'), nullable=True)
+    name: so.Mapped[str] = so.mapped_column(sa.String(120), nullable=False)
+    email: so.Mapped[str] = so.mapped_column(sa.String(120), nullable=False)
+    appointment_datetime: so.Mapped[Optional[sa.DateTime]] = so.mapped_column(sa.DateTime, nullable=False)
+    notes: so.Mapped[Optional[str]] = so.mapped_column(sa.Text, nullable=True)
+    created_at: so.Mapped[Optional[sa.DateTime]] = so.mapped_column(sa.DateTime, server_default=sa.func.now())
+
+    def __repr__(self) -> str:
+        return f"<Booking {self.id} {self.name} {self.appointment_datetime}>"
+
