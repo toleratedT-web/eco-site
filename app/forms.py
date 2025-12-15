@@ -1,17 +1,36 @@
-
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Email, Length, EqualTo
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, FloatField
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, InputRequired
+import sqlalchemy as sa
+from app import db
+from app.models import User
 
-class RegisterForm(FlaskForm):
-    email = StringField("Email", validators=[DataRequired(), Email(), Length(max=255)])
-    username = StringField("Username", validators=[DataRequired(), Length(min=3, max=64)])
-    password = PasswordField("Password", validators=[DataRequired(), Length(min=8)])
-    confirm_password = PasswordField("Confirm Password",
-                                     validators=[DataRequired(), EqualTo("password")])
-    submit = SubmitField("Create account")
+class FootprintForm(FlaskForm):
+    car_emission = FloatField("Car Emission", validators=[InputRequired()])  # Corrected here
+    electricity_usage = FloatField("Electricity Usage", validators=[InputRequired()])  # Corrected here
+    submit = SubmitField("Submit")
+
+class RegistrationForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Register')
+
+    def validate_username(self, username):
+        user = db.session.scalar(sa.select(User).where(
+            User.username == username.data))
+        if user is not None:
+            raise ValidationError('Please use a different username.')
+
+    def validate_email(self, email):
+        user = db.session.scalar(sa.select(User).where(
+            User.email == email.data))
+        if user is not None:
+            raise ValidationError('Please use a different email address.')
 
 class LoginForm(FlaskForm):
-    email_or_username = StringField("Email or Username", validators=[DataRequired()])
-    password = PasswordField("Password", validators=[DataRequired()])
-    remember = BooleanField("Remember me")
+    username = StringField('Username', validators=[DataRequired()])
+    password = PasswordField('Password', validators=[DataRequired()])
+    remember_me = BooleanField('Remember Me')
+    submit = SubmitField('Sign In')

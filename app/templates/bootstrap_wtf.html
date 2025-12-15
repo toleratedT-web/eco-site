@@ -1,0 +1,41 @@
+{% macro form_field(field, ns) %}
+  <div class="form-group">
+    <label for="{{ ns.first_field }}">{{ field.label }}</label>
+    {{ field(class="form-control") }}
+    {% if field.errors %}
+      <div class="invalid-feedback">
+        {% for error in field.errors %}
+          <p>{{ error }}</p>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+  {% set ns.first_field = field.id %}
+{% endmacro %}
+
+{% macro quick_form(form, action="", method="post", id="", novalidate=False) %}
+<form
+  {%- if action != None %} action="{{ action }}"{% endif %}
+  {%- if method %} method="{{ method }}"{% endif %}
+  {%- if id %} id="{{ id }}"{% endif %}
+  {%- if novalidate %} novalidate{% endif %}>
+  
+  {{ form.hidden_tag() }}
+  
+  {%- for field, errors in form.errors.items() %}
+    {%- if form[field].widget.input_type == 'hidden' %}
+      {%- for error in errors %}
+      <div class="invalid-feedback">{{ error }}</div>
+      {%- endfor %}
+    {%- endif %}
+  {%- endfor %}
+  
+  {% set ns = namespace(first_field=true) %}
+  
+  {%- for field in form %}
+    {% if field.widget.input_type != 'hidden' %}
+      {{ form_field(field, ns) }}
+    {% endif %}
+  {%- endfor %}
+</form>
+{% endmacro %}
