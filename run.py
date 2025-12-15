@@ -1,25 +1,22 @@
-from app import create_app  # Import the factory function that creates the app
-from extensions import db
-from app.models import User
-
 import sys
 import os
-from flask import Flask
+from app import create_app
+from extensions import db
 
-app = Flask(__name__)
+# Determine template and static folders if running as an exe
+extra_args = {}
+if getattr(sys, 'frozen', False):
+    extra_args = {
+        'template_folder': os.path.join(sys._MEIPASS, 'templates'),
+        'static_folder': os.path.join(sys._MEIPASS, 'static')
+    }
 
-if getattr(sys, 'frozen', False):  # Running as .exe
-    template_folder = os.path.join(sys._MEIPASS, 'templates')
-    static_folder = os.path.join(sys._MEIPASS, 'static')
-    app = Flask(__name__, template_folder=template_folder, static_folder=static_folder)
-else:  # Running normally
-    app = Flask(__name__, template_folder='templates', static_folder='static')
-
-app = create_app()  # Create the Flask app instance
-
+# Create Flask app via factory
+app = create_app(**extra_args)
 
 if __name__ == "__main__":
     with app.app_context():
-        # For first local run on SQLite; afterwards use Flask-Migrate
+        # Create tables for first run; afterwards use Flask-Migrate
         db.create_all()
+
     app.run(debug=True)
