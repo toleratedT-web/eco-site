@@ -36,6 +36,9 @@
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
 }
  
+<<<<<<< HEAD
+
+=======
 /* General Form Styling */
 form {
     width: 100%;
@@ -121,3 +124,4 @@ button[type="submit"]:disabled {
 input[type="hidden"] {
     display: none;
 }
+>>>>>>> fddfc1aa847306ac5fbb88a3306270d248ef156e
