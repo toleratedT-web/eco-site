@@ -1,16 +1,7 @@
-<<<<<<< HEAD
-# app/models.py
-from datetime import datetime
-=======
->>>>>>> fddfc1aa847306ac5fbb88a3306270d248ef156e
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from typing import Optional
-<<<<<<< HEAD
-from app import db, login
-=======
 from app import db, login 
->>>>>>> fddfc1aa847306ac5fbb88a3306270d248ef156e
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 
@@ -23,10 +14,6 @@ class User(UserMixin, db.Model):
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
-<<<<<<< HEAD
-    def check_password(self, password: str) -> bool:
-        return check_password_hash(self.password_hash, password)
-=======
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
@@ -34,4 +21,3 @@ class User(UserMixin, db.Model):
 def load_user(id):
     return db.session.get(User, int(id))
 
->>>>>>> fddfc1aa847306ac5fbb88a3306270d248ef156e

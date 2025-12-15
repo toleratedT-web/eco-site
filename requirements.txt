@@ -10,10 +10,7 @@ Flask-Migrate==4.1.0
 Flask-SQLAlchemy==3.1.1
 Flask-WTF==1.2.2
 greenlet==3.3.0
-<<<<<<< HEAD
-=======
 idna==3.11
->>>>>>> fddfc1aa847306ac5fbb88a3306270d248ef156e
 itsdangerous==2.2.0
 Jinja2==3.1.6
 Mako==1.3.10
@@ -23,10 +20,4 @@ python-dotenv==1.2.1
 SQLAlchemy==2.0.45
 typing_extensions==4.15.0
 Werkzeug==3.1.4
-<<<<<<< HEAD
 WTForms==3.2.1
- 
- 
-=======
-WTForms==3.2.1
->>>>>>> fddfc1aa847306ac5fbb88a3306270d248ef156e
