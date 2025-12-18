@@ -52,3 +52,12 @@ class BookingForm(FlaskForm):
     notes = TextAreaField('Notes (optional)', validators=[Length(max=1000)])
     submit = SubmitField('Request Booking')
 
+class ResetPasswordRequestForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    password2 = PasswordField(
+        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Request Password Reset')

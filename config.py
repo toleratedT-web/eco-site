@@ -14,3 +14,5 @@ class Config:
 
     SESSION_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_HTTPONLY = True
+    # Email sender for password reset
+    ADMINS = [os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@example.com')]
