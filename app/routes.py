@@ -152,16 +152,24 @@ def admin_logout():
 def admin_dashboard():
     if not current_user.is_admin:
         abort(403)
+
     total_bookings = Booking.query.count()
-    upcoming_bookings = Booking.query.filter(Booking.appointment_datetime >= datetime.utcnow()).count()
+
+    upcoming_bookings = Booking.query.filter(
+        Booking.appointment_datetime >= datetime.datetime.utcnow()
+    ).count()
+
     past_bookings = total_bookings - upcoming_bookings
+
     recent = Booking.query.order_by(Booking.id.desc()).limit(10).all()
-    # add any other analytics queries (group by month, source, etc.)
-    return render_template('admin_dashboard.html',
-                           total=total_bookings,
-                           upcoming=upcoming_bookings,
-                           past=past_bookings,
-                           recent=recent)
+
+    return render_template(
+        'admin_dashboard.html',
+        total=total_bookings,
+        upcoming=upcoming_bookings,
+        past=past_bookings,
+        recent=recent
+    )
 
 # Admin: Manage Users
 @bp.route('/admin/users')
