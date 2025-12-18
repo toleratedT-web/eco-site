@@ -53,13 +53,16 @@
       </ul>
 
       <!-- Right Side (Account) -->
-      <div class="d-flex">
+      <div class="d-flex align-items-center">
         {% if current_user.is_anonymous %}
-        <a href="{{ url_for('main.login_route') }}" class="btn btn-outline-light me-2">Login</a>
-        
-        <a href="{{ url_for('main.register') }}" class="btn btn-light text-success">Register</a>
+          <a href="{{ url_for('main.login_route') }}" class="btn btn-outline-light me-2">Login</a>
+          <a href="{{ url_for('main.register') }}" class="btn btn-light text-success">Register</a>
         {% else %}
-        <a href ="{{ url_for('main.logout_route') }}" class="btn btn-outline-light me-2">Logout</a>
+          {% if current_user.is_admin %}
+            <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-warning me-2">Admin Dashboard</a>
+            <a href="{{ url_for('main.admin_manage_users') }}" class="btn btn-warning me-2">Manage Users</a>
+          {% endif %}
+          <a href ="{{ url_for('main.logout_route') }}" class="btn btn-outline-light me-2">Logout</a>
         {% endif %}
       </div>
 

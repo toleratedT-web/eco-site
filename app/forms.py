@@ -51,3 +51,4 @@ class BookingForm(FlaskForm):
     time = TimeField('Preferred Time', validators=[DataRequired()])
     notes = TextAreaField('Notes (optional)', validators=[Length(max=1000)])
     submit = SubmitField('Request Booking')
+
