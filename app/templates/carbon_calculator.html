@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Calculate Carbon Footprint</h1>
+    <div class="container mt-4">
+        <h1 class="mb-4">Booking Form</h1>
+        <form action="{{ url_for('main.calculate') }}" method="post" novalidate>
+            {{ form.csrf_token }}
+            <div class="mb-3">
+                {{ form.car_emission.label(class="form-label") }}
+                {{ form.car_emission(class="form-control", type="number") }}
+                {% if form.car_emission.errors %}
+                    <div class="invalid-feedback d-block">{{ form.car_emission.errors[0] }}</div>
+                {% endif %}
+            </div>
+
+            <div class="mb-3">
+                {{ form.electricity_usage.label(class="form-label") }}
+                {{ form.electricity_usage(class="form-control", type="number") }}
+                {% if form.electricity_usage.errors %}
+                    <div class="invalid-feedback d-block">{{ form.electricity_usage.errors[0] }}</div>
+                {% endif %}
+            </div>
+
+            <div class="d-flex gap-2">
+                {{ form.submit(class="btn btn-success") }}
+            </div>
+        </form>
+        <div class="d-flex gap-2 py-3">
+            <a href="{{ url_for('main.home') }}" class="btn btn-primary">Cancel</a>
+        </div>
+    </div>
+{% endblock %}

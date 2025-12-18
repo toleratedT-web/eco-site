@@ -6,7 +6,7 @@
     <title>{% block title %}Rolsa Technologies{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Link to External Custom CSS -->
-    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="static/styles.css">
 </head>
 <body>
     <div class="wrapper"> <!-- Flex wrapper to manage layout -->
@@ -14,11 +14,14 @@
   <div class="container-fluid">
 
     <!-- Brand on the LEFT -->
-    <a href="{{ url_for('main.index') }}">
+
+    <a href="{{ url_for('main.home') }}">
     <img src="{{ url_for('static', filename='images/logo.png') }}" 
          alt="Rolsa Technologies Logo" 
          width="200">
     </a>
+
+
 
 
     <!-- Mobile Toggle Button -->
@@ -33,26 +36,31 @@
       <!-- Left Links -->
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" href="#">Home</a>
+          <a class="nav-link active" href="{{ url_for('main.home') }}">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Green Products</a>
+          <a class="nav-link" href="{{ url_for('main.green_products')}}">Green Products</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Carbon Calculator</a>
+          <a class="nav-link" href="{{ url_for('main.calculate') }}">Carbon Calculator</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Book a Consultation</a>
+          <a class="nav-link" href="{{ url_for('main.consultation')}}">Book a Consultation</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Energy Tracker</a>
+          <a class="nav-link" href="{{ url_for('main.energy_tracker') }}">Energy Tracker</a>
         </li>
       </ul>
 
       <!-- Right Side (Account) -->
       <div class="d-flex">
-        <a href="#" class="btn btn-outline-light me-2">Login</a>
-        <a href="#" class="btn btn-light text-success">Register</a>
+        {% if current_user.is_anonymous %}
+        <a href="{{ url_for('main.login_route') }}" class="btn btn-outline-light me-2">Login</a>
+        
+        <a href="{{ url_for('main.register') }}" class="btn btn-light text-success">Register</a>
+        {% else %}
+        <a href ="{{ url_for('main.logout_route') }}" class="btn btn-outline-light me-2">Logout</a>
+        {% endif %}
       </div>
 
     </div>
@@ -69,13 +77,17 @@
             <div class="container">
                 <span>&copy; 2025 Rolsa Technologies</span>
                 <span class="mx-2">|</span>
-                <a href="{{ url_for('main.privacy') }}" class="text-decoration-none text-light">
-                    Privacy & Cookies
-                </a>
+                <a href="#" id="policy-link">Policies</a>
             </div>
         </footer>
-    </div>
 
+    </div>
+    <!-- Base JS -->
+    <script src="{{ url_for('static', filename='js/policy.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/cookies.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Page-specific scripts -->
+    {% block scripts %}{% endblock %}
 </body>
 </html>
