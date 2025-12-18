@@ -57,5 +57,10 @@ window.showContent = function(id) {
     const selected = document.getElementById(id);
     if (selected) selected.style.display = 'grid'; // use grid for layout
 }
+
+// Show default category on page load (e.g., solar)
+document.addEventListener("DOMContentLoaded", function() {
+    window.showContent('solar'); // or 'ev' or 'appliances'
+});
 </script>
 {% endblock %}
