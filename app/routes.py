@@ -184,52 +184,51 @@ def admin_logout():
 def admin_dashboard():
     if not current_user.is_admin:
         abort(403)
-    total_bookings = Booking.query.count()
-    upcoming_bookings = Booking.query.filter(Booking.appointment_datetime >= datetime.utcnow()).count()
-    past_bookings = total_bookings - upcoming_bookings
-    recent = Booking.query.order_by(Booking.id.desc()).limit(10).all()
-    # add any other analytics queries (group by month, source, etc.)
-    return render_template('admin_dashboard.html',
-                           total=total_bookings,
-                           upcoming=upcoming_bookings,
-                           past=past_bookings,
-                           recent=recent)
 
-# Admin: Manage Users
-@bp.route('/admin/users')
+    total_bookings = Booking.query.count()
+
+    upcoming_bookings = Booking.query.filter(
+        Booking.appointment_datetime >= datetime.datetime.utcnow()
+    ).count()
+
+    past_bookings = total_bookings - upcoming_bookings
+
+    recent = Booking.query.order_by(Booking.id.desc()).limit(10).all()
+
+    return render_template(
+        'admin_dashboard.html',
+        total=total_bookings,
+        upcoming=upcoming_bookings,
+        past=past_bookings,
+        recent=recent
+    )
+
+@bp.route('/admin/users', methods=['GET', 'POST'])
 @login_required
 def admin_manage_users():
     if not current_user.is_admin:
         abort(403)
+
+    if request.method == 'POST':
+        action = request.form.get('action')
+        user_id = request.form.get('user_id')
+        user = User.query.get_or_404(user_id)
+
+        if action == 'edit':
+            user.username = request.form['username']
+            user.email = request.form['email']
+            user.is_admin = 'is_admin' in request.form
+            flash('User updated successfully.')
+
+        elif action == 'delete':
+            if user.id == current_user.id:
+                flash('You cannot delete yourself.', 'danger')
+            else:
+                db.session.delete(user)
+                flash('User deleted successfully.')
+
+        db.session.commit()
+        return redirect(url_for('main.admin_manage_users'))
+
     users = User.query.all()
     return render_template('admin_manage_users.html', users=users)
-
-# Admin: Edit User
-@bp.route('/admin/users/edit/<int:user_id>', methods=['GET', 'POST'])
-@login_required
-def edit_user(user_id):
-    if not current_user.is_admin:
-        abort(403)
-    user = User.query.get_or_404(user_id)
-    if request.method == 'POST':
-        user.username = request.form['username']
-        user.email = request.form['email']
-        user.is_admin = 'is_admin' in request.form
-        db.session.commit()
-        flash('User updated successfully.')
-        return redirect(url_for('main.admin_manage_users'))
-    return render_template('edit_user.html', user=user)
-
-# Admin: Delete User
-@bp.route('/admin/users/delete/<int:user_id>', methods=['POST', 'GET'])
-@login_required
-def delete_user(user_id):
-    if not current_user.is_admin:
-        abort(403)
-    user = User.query.get_or_404(user_id)
-    if request.method == 'POST':
-        db.session.delete(user)
-        db.session.commit()
-        flash('User deleted.')
-        return redirect(url_for('main.admin_manage_users'))
-    return render_template('confirm_delete_user.html', user=user)
