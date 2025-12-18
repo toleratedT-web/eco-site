@@ -3,7 +3,6 @@
 {% block content %}
     <h1>Calculate Carbon Footprint</h1>
     <div class="container mt-4">
-        <h1 class="mb-4">Booking Form</h1>
         <form action="{{ url_for('main.carbon_calculator') }}" method="post" novalidate>
             {{ form.csrf_token }}
             <div class="mb-3">

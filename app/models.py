@@ -67,3 +67,4 @@ class Footprint(db.Model):
     name = db.Column(db.String(100), nullable=False)
     car_emission = db.Column(db.Float(100), nullable=False)
     electricity_usage = db.Column(db.Float(100), nullable=False)
+    total_footprint = db.Column(db.Float(100), nullable=False)

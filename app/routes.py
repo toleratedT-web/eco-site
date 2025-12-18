@@ -4,7 +4,7 @@ from app import db, login
 from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
-from app.models import User, Booking, Product
+from app.models import User, Booking, Product, Footprint
 import datetime
 
 # Blueprint for routes
@@ -108,6 +108,11 @@ def reset_password():
     return render_template('reset_password.html', title='Reset Password')
 
 
+@bp.route("/footprint_dashboard")
+def footprint_dashboard():
+    footprints = Footprint.query.order_by(Footprint.car_emission).all()
+    return render_template("footprint_dashboard.html", footprints=footprints)
+
 @bp.route('/carbon_calculator', methods=['GET', 'POST'])
 def carbon_calculator():
     form = FootprintForm()
@@ -116,11 +121,12 @@ def carbon_calculator():
             footprint = Footprint(
                 name=form.name.data,
                 car_emission=form.car_emission.data,
-                electricity_usage=form.electricity_usage.data
+                electricity_usage=form.electricity_usage.data,
+                total_footprint=((form.car_emission.data * 0.21) + (form.electricity_usage.data * 0.222))
             )
             db.session.add(footprint)
             db.session.commit()
-            return redirect(url_for('home'))
+            return redirect(url_for('main.footprint_dashboard'))
 
     return render_template('carbon_calculator.html', title='Carbon Footprint Calculator', form=form)
 
