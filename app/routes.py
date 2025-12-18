@@ -108,27 +108,16 @@ def reset_password():
     return render_template('reset_password.html', title='Reset Password')
 
 
-@bp.route('/calculate', methods=['GET', 'POST'])
-def calculate():
+@bp.route('/carbon_calculator', methods=['GET', 'POST'])
+def carbon_calculator():
     form = FootprintForm()
-    if request.method == 'POST':
+    if request.method == "POST":
         if form.validate_on_submit():
-            car_emission_calculation = round(form.car_emission.data * 0.21, 2)
-            electricity_calculation = round(form.electricity_usage.data * 0.222, 2)
-            total = car_emission_calculation + electricity_calculation
-            session['car_emission'] = form.car_emission.data
-            session['electricity_usage'] = form.electricity_usage.data
-            session['total'] = total
-            return redirect(url_for('main.calculate'))
+            footprint = Footprint(
+                
+            )
 
-    submitted_car_emission = session.pop('car_emission', None)
-    submitted_electricity_usage = session.pop('electricity_usage', None)
-    submitted_total = session.pop('total', None)
-
-    return render_template('carbon_calculator.html', title='Carbon Footprint Calculator', form=form,
-                           submitted_car_emission=submitted_car_emission,
-                           submitted_electricity_usage=submitted_electricity_usage,
-                           submitted_total=submitted_total)
+    return render_template('carbon_calculator.html', title='Carbon Footprint Calculator')
 
 @bp.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():

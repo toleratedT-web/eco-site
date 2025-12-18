@@ -61,3 +61,8 @@ class Product(db.Model):
     image_filename = db.Column(db.String(100), nullable=False)
     category = db.Column(db.String(50), nullable=False)  # 'solar', 'ev', 'appliances'
     price = db.Column(db.Float, nullable=False)  # price in your currency
+
+class Footprint(db.Model):
+    name = db.Column(db.String(100), nullable=False)
+    car_emission = db.Column(db.Float(100), nullable=False)
+    electricity_usage = db.Column(db.Float(100), nullable=False)
