@@ -114,10 +114,16 @@ def carbon_calculator():
     if request.method == "POST":
         if form.validate_on_submit():
             footprint = Footprint(
-                
+                name=form.name.data,
+                car_emission=form.car_emission.data,
+                electricity_usage=form.electricity_usage.data
             )
+            db.session.add(footprint)
+            db.session.commit()
+            return redirect(url_for('home'))
 
-    return render_template('carbon_calculator.html', title='Carbon Footprint Calculator')
+    return render_template('carbon_calculator.html', title='Carbon Footprint Calculator', form=form)
+
 
 @bp.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():

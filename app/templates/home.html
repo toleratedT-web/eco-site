@@ -15,7 +15,7 @@
             <h1 class="display-5 fw-bold">Sustainable Energy & Carbon Solutions</h1>
             <p class="lead">Helping businesses and homeowners reduce emissions, save energy, and transition to renewables.</p>
             <div class="mt-4">
-                <a href="{{ url_for('main.calculate') }}" class="btn btn-success btn-lg me-2">Calculate My Footprint</a>
+                <a href="{{ url_for('main.carbon_calculator') }}" class="btn btn-success btn-lg me-2">Calculate My Footprint</a>
                 <a href="{{ url_for('main.register') }}" class="btn btn-outline-light btn-lg">Get Started</a>
             </div>
         </div>
@@ -54,7 +54,7 @@
                     <li>Transparent pricing and ROI estimates</li>
                     <li>Experienced installation and support</li>
                 </ul>
-                <a href="{{ url_for('main.calculate') }}" class="btn btn-success">Start Your Assessment</a>
+                <a href="{{ url_for('main.carbon_calculator') }}" class="btn btn-success">Start Your Assessment</a>
             </div>
             <div class="col-md-6">
                 <img src="{{ url_for('static', filename='images/solar_panels.jpg') }}" alt="Solar panels" class="img-fluid rounded shadow">
