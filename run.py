@@ -2,7 +2,9 @@ from app import create_app, db  # Import the factory function that creates the a
 from app.models import User
 import sys
 import os
-from flask import Flask
+from app import create_app
+
+
 
 # Use the create_app function to initialize the app with the correct configuration
 app = create_app()  # Create the Flask app instance
@@ -12,5 +14,8 @@ if __name__ == "__main__":
         # For first local run on SQLite; afterwards use Flask-Migrate
         db.create_all()  # Create all database tables
     app.run(debug=True)  # Run the app
+<<<<<<< HEAD
 
     
+=======
+>>>>>>> 4d9976aaa9bd9fd13153768e2cd66209be4364aa

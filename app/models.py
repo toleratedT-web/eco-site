@@ -1,7 +1,11 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from typing import Optional
+<<<<<<< HEAD
 from app import db, login
+=======
+from app import db, login 
+>>>>>>> 4d9976aaa9bd9fd13153768e2cd66209be4364aa
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from . import db
