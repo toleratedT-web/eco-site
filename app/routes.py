@@ -218,6 +218,10 @@ def admin_manage_users():
             user.username = request.form['username']
             user.email = request.form['email']
             user.is_admin = 'is_admin' in request.form
+            new_password = request.form.get('new_password')
+            if new_password:
+                user.set_password(new_password)
+                flash('Password updated for user.')
             flash('User updated successfully.')
 
         elif action == 'delete':

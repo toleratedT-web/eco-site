@@ -3,5 +3,27 @@
 
 {% block content %}
     <h1>Register</h1>
-    {{ wtf.quick_form(form) }}
+    <form method="post">
+        {{ form.hidden_tag() }}
+        <div class="mb-3">
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control") }}
+        </div>
+        <div class="mb-3">
+            {{ form.password2.label(class="form-label") }}
+            {{ form.password2(class="form-control") }}
+        </div>
+        <div class="d-grid mb-3">
+            {{ form.submit(class_='btn btn-primary') }}
+        </div>
+    </form>
+    
 {% endblock %}

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Edit User{% endblock %}
+{% block content %}
+  <h1>Edit User</h1>
+  <form method="post">
+    <div class="mb-3">
+      <label for="username" class="form-label">Username</label>
+      <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+      <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+    </div>
+    <div class="form-check mb-3">
+      <input class="form-check-input" type="checkbox" id="is_admin" name="is_admin" {% if user.is_admin %}checked{% endif %}>
+      <label class="form-check-label" for="is_admin">Admin</label>
+    </div>
+    <div class="mb-3">
+      <label for="new_password" class="form-label">Change Password</label>
+      <input type="password" class="form-control" id="new_password" name="new_password" placeholder="Enter new password">
+      <small class="form-text text-muted">Leave blank to keep current password.</small>
+    </div>
+    <button type="submit" class="btn btn-success">Save</button>
+    <a href="{{ url_for('main.admin_manage_users') }}" class="btn btn-secondary">Cancel</a>
+  </form>
+{% endblock %}
