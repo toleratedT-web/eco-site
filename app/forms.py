@@ -11,7 +11,7 @@ class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
     remember = BooleanField('Remember me')
-    submit = SubmitField('Sign In')
+    submit = SubmitField('Login')
 
 class FootprintForm(FlaskForm):
     car_emission = FloatField("Car Emission", validators=[InputRequired()])  # Corrected here
@@ -52,3 +52,12 @@ class BookingForm(FlaskForm):
     notes = TextAreaField('Notes (optional)', validators=[Length(max=1000)])
     submit = SubmitField('Request Booking')
 
+class ResetPasswordRequestForm(FlaskForm):
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Request Password Reset')
+
+class ResetPasswordForm(FlaskForm):
+    password = PasswordField('Password', validators=[DataRequired()])
+    password2 = PasswordField(
+        'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Request Password Reset')

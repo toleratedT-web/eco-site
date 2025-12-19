@@ -6,6 +6,10 @@ from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from app.models import User, Booking, Product
 import datetime
+from app.forms import ResetPasswordRequestForm
+from app.email import send_password_reset_email
+from datetime import datetime
+from app.forms import ResetPasswordForm
 
 # Blueprint for routes
 bp = Blueprint('main', __name__)
@@ -36,7 +40,7 @@ def green_products():
 def consultation():
     form = BookingForm()
     if form.validate_on_submit():
-        appointment_dt = datetime.datetime.combine(form.date.data, form.time.data)
+        appointment_dt = datetime.combine(form.date.data, form.time.data)
         booking = Booking(
             user_id=current_user.id if current_user.is_authenticated else None,
             name=form.name.data,
@@ -103,9 +107,37 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-@bp.route('/reset_password', methods=['GET', 'POST'])
-def reset_password():
-    return render_template('reset_password.html', title='Reset Password')
+
+
+# Password reset request (user enters email)
+@bp.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.home'))
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            send_password_reset_email(user)
+        flash('Check your email for instructions to reset your password.')
+        return redirect(url_for('main.login_route'))
+    return render_template('reset_password_request.html', form=form)
+
+# Password reset with token
+@bp.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('main.home'))
+    user = User.verify_reset_password_token(token)
+    if not user:
+        return redirect(url_for('main.home'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        db.session.commit()
+        flash('Your password has been reset.')
+        return redirect(url_for('main.login_route'))
+    return render_template('reset_password.html', form=form)
 
 
 @bp.route('/calculate', methods=['GET', 'POST'])
@@ -156,8 +188,7 @@ def admin_dashboard():
     total_bookings = Booking.query.count()
 
     upcoming_bookings = Booking.query.filter(
-        Booking.appointment_datetime >= datetime.datetime.utcnow()
-    ).count()
+        Booking.appointment_datetime >= datetime.utcnow()).count()
 
     past_bookings = total_bookings - upcoming_bookings
 
@@ -186,6 +217,10 @@ def admin_manage_users():
             user.username = request.form['username']
             user.email = request.form['email']
             user.is_admin = 'is_admin' in request.form
+            new_password = request.form.get('new_password')
+            if new_password:
+                user.set_password(new_password)
+                flash('Password updated for user.')
             flash('User updated successfully.')
 
         elif action == 'delete':

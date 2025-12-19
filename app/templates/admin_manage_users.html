@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% block content %}
 
@@ -8,46 +9,45 @@
         <tr>
             <th>Username</th>
             <th>Email</th>
-            <th>Admin</th>
+            <th class="text-center">Admin</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-    {% for user in users %}
+        {% for user in users %}
+        {% set fid = 'f-' ~ user.id %}
         <tr>
-            <form method="POST">
-                <input type="hidden" name="user_id" value="{{ user.id }}">
+            <td>
+                <input class="form-control" name="username" value="{{ user.username }}" form="{{ fid }}">
+            </td>
 
-                <td>
-                    <input class="form-control" name="username" value="{{ user.username }}">
-                </td>
+            <td>
+                <input class="form-control" name="email" value="{{ user.email }}" form="{{ fid }}">
+            </td>
 
-                <td>
-                    <input class="form-control" name="email" value="{{ user.email }}">
-                </td>
+            <td class="text-center">
+                <input type="checkbox" name="is_admin" {% if user.is_admin %}checked{% endif %} form="{{ fid }}">
+            </td>
 
-                <td class="text-center">
-                    <input type="checkbox" name="is_admin" {% if user.is_admin %}checked{% endif %}>
-                </td>
+            <td>
+                <form id="{{ fid }}" method="POST">
+                    {# Flask-WTF: {{ csrf_token() }} | Django: {% csrf_token %} #}
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
 
-                <td>
-                    <button class="btn btn-sm btn-success" name="action" value="edit">
-                        Save
-                    </button>
+                    <button class="btn btn-sm btn-success" name="action" value="edit">Save</button>
 
                     {% if user.id != current_user.id %}
                     <button class="btn btn-sm btn-danger"
-                            name="action"
-                            value="delete"
+                            name="action" value="delete"
                             onclick="return confirm('Delete this user?')">
                         Delete
                     </button>
                     {% endif %}
-                </td>
-            </form>
+                </form>
+            </td>
         </tr>
-    {% endfor %}
-    </tbody>
+        {% endfor %}
+
 </table>
 
 {% endblock %}

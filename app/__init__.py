@@ -10,6 +10,13 @@ db = SQLAlchemy()
 migrate = Migrate()
 login = LoginManager()
 
+# Create global app and ensure ADMINS config is set
+app = Flask(__name__)
+app.config.from_object(Config)
+if 'ADMINS' not in app.config:
+    app.config['ADMINS'] = [app.config.get('MAIL_DEFAULT_SENDER', 'noreply@example.com')]
+mail = Mail(app)
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
