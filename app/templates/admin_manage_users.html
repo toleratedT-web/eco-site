@@ -1,0 +1,53 @@
+
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Manage Users</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th class="text-center">Admin</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for user in users %}
+        {% set fid = 'f-' ~ user.id %}
+        <tr>
+            <td>
+                <input class="form-control" name="username" value="{{ user.username }}" form="{{ fid }}">
+            </td>
+
+            <td>
+                <input class="form-control" name="email" value="{{ user.email }}" form="{{ fid }}">
+            </td>
+
+            <td class="text-center">
+                <input type="checkbox" name="is_admin" {% if user.is_admin %}checked{% endif %} form="{{ fid }}">
+            </td>
+
+            <td>
+                <form id="{{ fid }}" method="POST">
+                    {# Flask-WTF: {{ csrf_token() }} | Django: {% csrf_token %} #}
+                    <input type="hidden" name="user_id" value="{{ user.id }}">
+
+                    <button class="btn btn-sm btn-success" name="action" value="edit">Save</button>
+
+                    {% if user.id != current_user.id %}
+                    <button class="btn btn-sm btn-danger"
+                            name="action" value="delete"
+                            onclick="return confirm('Delete this user?')">
+                        Delete
+                    </button>
+                    {% endif %}
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+
+</table>
+
+{% endblock %}
