@@ -40,7 +40,7 @@ def green_products():
 def consultation():
     form = BookingForm()
     if form.validate_on_submit():
-        appointment_dt = datetime.datetime.combine(form.date.data, form.time.data)
+        appointment_dt = datetime.combine(form.date.data, form.time.data)
         booking = Booking(
             user_id=current_user.id if current_user.is_authenticated else None,
             name=form.name.data,
@@ -188,8 +188,7 @@ def admin_dashboard():
     total_bookings = Booking.query.count()
 
     upcoming_bookings = Booking.query.filter(
-        Booking.appointment_datetime >= datetime.datetime.utcnow()
-    ).count()
+        Booking.appointment_datetime >= datetime.utcnow()).count()
 
     past_bookings = total_bookings - upcoming_bookings
 
