@@ -15,8 +15,8 @@ class LoginForm(FlaskForm):
 
 class FootprintForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
-    car_emission = FloatField("Car Emission", validators=[InputRequired()])  # Corrected here
-    electricity_usage = FloatField("Electricity Usage", validators=[InputRequired()])  # Corrected here
+    car_emission = FloatField("Distance Travelled (km)", validators=[InputRequired()])  # Corrected here
+    electricity_usage = FloatField("Electricity Usage (kWh)", validators=[InputRequired()])  # Corrected here
     submit = SubmitField("Submit")
 
 class RegistrationForm(FlaskForm):

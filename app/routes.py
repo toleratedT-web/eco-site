@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request, session, abort
+from flask import Blueprint, jsonify, render_template, flash, redirect, url_for, request, session, abort
 from urllib.parse import urlsplit
 from app import db, login
 from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
+from sqlalchemy import func
 from app.models import User, Booking, Product, Footprint
 import datetime
 
@@ -109,20 +110,22 @@ def reset_password():
 
 
 @bp.route("/footprint_dashboard")
+#@login_required
 def footprint_dashboard():
     footprints = Footprint.query.order_by(Footprint.car_emission).all()
     return render_template("footprint_dashboard.html", footprints=footprints)
 
 @bp.route('/carbon_calculator', methods=['GET', 'POST'])
+#@login_required
 def carbon_calculator():
     form = FootprintForm()
     if request.method == "POST":
         if form.validate_on_submit():
             footprint = Footprint(
-                name=form.name.data,
-                car_emission=form.car_emission.data,
-                electricity_usage=form.electricity_usage.data,
-                total_footprint=((form.car_emission.data * 0.21) + (form.electricity_usage.data * 0.222))
+                name=form.name.data, #current_user.id,
+                car_emission=round((form.car_emission.data * 0.21), 2),
+                electricity_usage=round((form.electricity_usage.data * 0.222), 2),
+                total_footprint=round(((form.car_emission.data * 0.21) + (form.electricity_usage.data * 0.222)), 2)
             )
             db.session.add(footprint)
             db.session.commit()
@@ -130,6 +133,33 @@ def carbon_calculator():
 
     return render_template('carbon_calculator.html', title='Carbon Footprint Calculator', form=form)
 
+@bp.route("/delete/<id>", methods=["POST"])
+def delete(id):
+    footprint = Footprint.query.get_or_404(id)
+    db.session.delete(footprint)
+    db.session.commit()
+    return redirect(url_for('main.footprint_dashboard'))
+
+@bp.route("/api/total-footprints")
+def total_footprints():
+    total = db.session.query(func.sum(Footprint.total_footprint)).scalar() or 0
+    return jsonify({"total_footprints": total})
+
+@bp.route("/api/top-five-footprints")
+def top_five_footprints():
+    results = (
+        db.session.query(Footprint.name, func.sum(Footprint.total_footprint))
+        .group_by(Footprint.name)
+        .order_by(func.sum(Footprint.total_footprint).desc())
+        .limit(5)
+        .all()
+    )
+
+    data = [
+        {"name": name, "total": total}
+        for name, total in results
+    ]
+    return jsonify(data)
 
 @bp.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
