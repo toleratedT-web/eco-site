@@ -68,3 +68,4 @@ class Footprint(db.Model):
     car_emission = db.Column(db.Float(100), nullable=False)
     electricity_usage = db.Column(db.Float(100), nullable=False)
     total_footprint = db.Column(db.Float(100), nullable=False)
+    date = db.Column(db.Date, nullable=False)

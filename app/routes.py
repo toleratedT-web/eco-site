@@ -7,6 +7,7 @@ import sqlalchemy as sa
 from sqlalchemy import func
 from app.models import User, Booking, Product, Footprint
 import datetime
+from datetime import date
 
 # Blueprint for routes
 bp = Blueprint('main', __name__)
@@ -110,22 +111,23 @@ def reset_password():
 
 
 @bp.route("/footprint_dashboard")
-#@login_required
+#@login_required - for logged users only
 def footprint_dashboard():
-    footprints = Footprint.query.order_by(Footprint.car_emission).all()
+    footprints = Footprint.query.order_by(Footprint.id).all()
     return render_template("footprint_dashboard.html", footprints=footprints)
 
 @bp.route('/carbon_calculator', methods=['GET', 'POST'])
-#@login_required
+#@login_required - for logged users only
 def carbon_calculator():
     form = FootprintForm()
     if request.method == "POST":
         if form.validate_on_submit():
             footprint = Footprint(
-                name=form.name.data, #current_user.id,
+                name=form.name.data, #current_user.id - replace with this when logged in,
                 car_emission=round((form.car_emission.data * 0.21), 2),
                 electricity_usage=round((form.electricity_usage.data * 0.222), 2),
-                total_footprint=round(((form.car_emission.data * 0.21) + (form.electricity_usage.data * 0.222)), 2)
+                total_footprint=round(((form.car_emission.data * 0.21) + (form.electricity_usage.data * 0.222)), 2),
+                date = form.date.data
             )
             db.session.add(footprint)
             db.session.commit()
@@ -143,7 +145,7 @@ def delete(id):
 @bp.route("/api/total-footprints")
 def total_footprints():
     total = db.session.query(func.sum(Footprint.total_footprint)).scalar() or 0
-    return jsonify({"total_footprints": total})
+    return jsonify({"total_footprints": round(total, 2)})
 
 @bp.route("/api/top-five-footprints")
 def top_five_footprints():
@@ -158,6 +160,31 @@ def top_five_footprints():
     data = [
         {"name": name, "total": total}
         for name, total in results
+    ]
+    return jsonify(data)
+
+@bp.route("/api/footprints-recorded-today")
+def footprints_recorded_today():
+    total = (
+        db.session.query(func.count(Footprint.id))
+        .filter(Footprint.date == date.today())
+        .scalar()
+    )
+
+    return jsonify({"total": int(total or 0)})
+
+@bp.route("/api/footprints-per-day")
+def footprints_per_day():
+    results = (
+        db.session.query(Footprint.date, func.sum(Footprint.total_footprint))
+        .group_by(Footprint.date)
+        .order_by(Footprint.date)
+        .all()
+    )
+
+    data = [
+        {"date": date.isoformat(), "total": total}
+        for date, total in results
     ]
     return jsonify(data)
 
