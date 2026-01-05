@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {% extends "base.html" %}
 
 {% block content %}
@@ -31,3 +32,38 @@
     {% endfor %}
 </div>
 {% endblock %}
+=======
+<h1>Products</h1>
+<a href="{{ url_for('main.add_product') }}">Add New Product</a>
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Category</th>
+            <th>Price</th>
+            <th>Image</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+        <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ product.category }}</td>
+            <td>{{ product.price }}</td>
+            <td>
+                {% if product.image_data %}
+                <img src="data:{{ product.image_mimetype }};base64,{{ product.image_data | b64encode }}" width="100">
+                {% endif %}
+            </td>
+            <td>
+                <a href="{{ url_for('main.edit_product', product_id=product.id) }}">Edit</a>
+                <form action="{{ url_for('main.delete_product', product_id=product.id) }}" method="post" style="display:inline;">
+                    <button type="submit">Delete</button>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+>>>>>>> 835c9459cd9cecbde546846d855e1e09ac9f28ac

@@ -14,17 +14,18 @@
     <ul>
     {% for item in basket.items %}
         <li>
-            {{ item.name }} -
-            Quantity: {{ item.quantity }} -
-            Price: {{ item.price }}
+            {{ item.name }} — Quantity: {{ item.quantity }} — Price: {{ item.price }} — Total: {{ item.total }}
+            <form action="{{ url_for('main.remove_from_basket', item_id=item.id) }}" method="post" style="display:inline">
+                <button type="submit" class="btn btn-link btn-sm">Remove</button>
+            </form>
         </li>
     {% endfor %}
     </ul>
 
     <p><strong>Total:</strong> {{ basket.total_price }}</p>
 
-    <form action="{{ url_for('checkout') }}" method="post">
-        <button type="submit">Proceed to Checkout</button>
+    <form action="#" method="post">
+        <button type="button" class="btn btn-primary">Proceed to Checkout</button>
     </form>
 {% else %}
     <p>Your basket is empty.</p>

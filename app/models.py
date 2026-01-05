@@ -12,6 +12,7 @@ from app import app
 #Admin
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
@@ -67,3 +68,40 @@ class Product(db.Model):
     image_filename = db.Column(db.String(100), nullable=False)
     category = db.Column(db.String(50), nullable=False)  # 'solar', 'ev', 'appliances'
     price = db.Column(db.Float, nullable=False)  # price in your currency
+
+
+class Basket(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True)
+    user = db.relationship('User', backref=db.backref('basket', uselist=False))
+
+
+class BasketItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    basket_id = db.Column(db.Integer, db.ForeignKey('basket.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False, default=1)
+    product = db.relationship('Product')
+    basket = db.relationship('Basket', backref=db.backref('items', lazy='joined'))
+
+
+class SupportMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    subject = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=sa.func.now())
+
+
+class EnergyEntry(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    entry_date = db.Column(db.Date, nullable=False)
+    kwh = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=sa.func.now())
+
+
+class EnergyGoal(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True)
+    daily_kwh_goal = db.Column(db.Float, nullable=True)
