@@ -1,33 +1,33 @@
-<h1>Products</h1>
-<a href="{{ url_for('main.add_product') }}">Add New Product</a>
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Price</th>
-            <th>Image</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for product in products %}
-        <tr>
-            <td>{{ product.name }}</td>
-            <td>{{ product.category }}</td>
-            <td>{{ product.price }}</td>
-            <td>
-                {% if product.image_data %}
-                <img src="data:{{ product.image_mimetype }};base64,{{ product.image_data | b64encode }}" width="100">
-                {% endif %}
-            </td>
-            <td>
-                <a href="{{ url_for('main.edit_product', product_id=product.id) }}">Edit</a>
-                <form action="{{ url_for('main.delete_product', product_id=product.id) }}" method="post" style="display:inline;">
-                    <button type="submit">Delete</button>
+{% extends "base.html" %}
+
+{% block content %}
+<h1 style="margin-bottom: 30px;">Products</h1>
+
+<a href="{{ url_for('main.add_product') }}" class="btn-add" style="margin-bottom: 20px; display:inline-block;">Add New Product</a>
+
+<div class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <div class="card-image-wrapper">
+            {% if product.image_data %}
+            <img src="data:{{ product.image_mimetype }};base64,{{ product.image_data | b64encode }}" alt="{{ product.name }}">
+            {% else %}
+            <img src="{{ url_for('static', filename='images/placeholder.png') }}" alt="No image">
+            {% endif %}
+            <div class="card-actions">
+                <a href="{{ url_for('main.edit_product', product_id=product.id) }}" title="Edit">&#9998;</a>
+                <form action="{{ url_for('main.delete_product', product_id=product.id) }}" method="post">
+                    <button type="submit" title="Delete">&#128465;</button>
                 </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+            </div>
+        </div>
+
+        <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="category">{{ product.category }}</p>
+            <p class="price">${{ product.price }}</p>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
