@@ -23,7 +23,7 @@ def veriy_reset_token(token, expiration=3600):
 from flask_mail import Message
 from flask import url_for
 
-def send_recovery_email(user_email):
+def send_password_reset_email(user_email):
     token = generate_reset_token(user_email)
     reset_url = url_for(
         "reset_password",
