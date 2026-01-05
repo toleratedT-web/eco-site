@@ -53,6 +53,7 @@
                                 {% if current_user.is_admin %}
                                     <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard') }}">Admin Dashboard</a></li>
                                     <li><a class="dropdown-item" href="{{ url_for('main.admin_manage_users') }}">Manage Users</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.admin_products') }}">Products</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                 {% endif %}
                                 <li><a class="dropdown-item" href="{{ url_for('main.settings') }}">Settings</a></li>
