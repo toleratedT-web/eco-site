@@ -11,8 +11,15 @@ from app.email import send_password_reset_email
 from datetime import datetime
 from app.forms import ResetPasswordForm
 
+
 # Blueprint for routes
 bp = Blueprint('main', __name__)
+
+# Basket page route
+@bp.route('/basket')
+@login_required
+def basket():
+    return render_template('basket.html')
 
 # Load user for Flask-Login
 @login.user_loader

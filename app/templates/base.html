@@ -41,11 +41,23 @@
                             <a href="{{ url_for('main.login_route') }}" class="btn btn-outline-light me-2">Login</a>
                             <a href="{{ url_for('main.register') }}" class="btn btn-light text-success">Register</a>
                         {% else %}
-                            {% if current_user.is_admin %}
-                                <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-warning me-2">Admin Dashboard</a>
-                                <a href="{{ url_for('main.admin_manage_users') }}" class="btn btn-warning me-2">Manage Users</a>
-                            {% endif %}
-                            <a href="{{ url_for('main.logout_route') }}" class="btn btn-outline-light me-2">Logout</a>
+                        <a href="{{ url_for('main.basket') }}" class="me-3 basket-link d-flex align-items-center" title="View Basket">
+                            <img src="{{ url_for('static', filename='images/basket.png') }}" alt="Basket" width="32" height="32" class="basket-icon">
+                        </a>
+                        <div class="dropdown">
+                            <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{{ url_for('static', filename='images/profile_picture.png') }}" alt="Profile" width="40" height="40" class="rounded-circle me-2">
+                                <span>{{ current_user.username }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                {% if current_user.is_admin %}
+                                    <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard') }}">Admin Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.admin_manage_users') }}">Manage Users</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{{ url_for('main.logout_route') }}">Logout</a></li>
+                            </ul>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
