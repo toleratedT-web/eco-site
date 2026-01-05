@@ -77,9 +77,6 @@ class ProductForm(FlaskForm):
     )
     price = FloatField('Price', validators=[DataRequired(), NumberRange(min=0)])
     image = FileField('Product Image', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Images only!')])
-<<<<<<< HEAD
-    submit = SubmitField('Save')
-=======
     submit = SubmitField('Save')
 
 
@@ -117,4 +114,3 @@ class EnergyEntryForm(FlaskForm):
 class EnergyGoalForm(FlaskForm):
     daily_kwh_goal = FloatField('Daily kWh Goal', validators=[DataRequired()])
     submit = SubmitField('Save Goal')
->>>>>>> 835c9459cd9cecbde546846d855e1e09ac9f28ac
