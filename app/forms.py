@@ -6,6 +6,11 @@ from wtforms.validators import Length, DataRequired
 import sqlalchemy as sa
 from app import db
 from app.models import User
+from flask_wtf import FlaskForm
+from wtforms import StringField, TextAreaField, SelectField, FileField
+from wtforms.validators import  NumberRange
+from flask_wtf.file import FileAllowed
+
 
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -61,3 +66,15 @@ class ResetPasswordForm(FlaskForm):
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Request Password Reset')
+
+class ProductForm(FlaskForm):
+    name = StringField('Product Name', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    category = SelectField(
+        'Category',
+        choices=[('solar', 'Solar'), ('ev', 'EV'), ('appliances', 'Appliances')],
+        validators=[DataRequired()]
+    )
+    price = FloatField('Price', validators=[DataRequired(), NumberRange(min=0)])
+    image = FileField('Product Image', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Images only!')])
+    submit = SubmitField('Save')
