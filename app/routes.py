@@ -16,8 +16,15 @@ import os
 from werkzeug.utils import secure_filename
 from flask import current_app
 
+
 # Blueprint for routes
 bp = Blueprint('main', __name__)
+
+# Basket page route
+@bp.route('/basket')
+@login_required
+def basket():
+    return render_template('basket.html')
 
 # Load user for Flask-Login
 @login.user_loader
@@ -243,6 +250,7 @@ def admin_manage_users():
 
     users = User.query.all()
     return render_template('admin_manage_users.html', users=users)
+<<<<<<< HEAD
 
 # Admin: List all products
 @bp.route('/admin/products')
@@ -330,3 +338,5 @@ def delete_product(product_id):
     flash('Product deleted successfully.')
     return redirect(url_for('main.admin_products'))
 
+=======
+>>>>>>> 1969204fdda817d81c68babfa45e1616e2ca350e
