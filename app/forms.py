@@ -78,3 +78,39 @@ class ProductForm(FlaskForm):
     price = FloatField('Price', validators=[DataRequired(), NumberRange(min=0)])
     image = FileField('Product Image', validators=[FileAllowed(['jpg', 'jpeg', 'png', 'gif'], 'Images only!')])
     submit = SubmitField('Save')
+
+
+class SettingsForm(FlaskForm):
+    name = StringField('Full Name', validators=[Length(max=120)])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Save Settings')
+
+
+class ChangePasswordForm(FlaskForm):
+    current_password = PasswordField('Current Password', validators=[DataRequired()])
+    password = PasswordField('New Password', validators=[DataRequired()])
+    password2 = PasswordField('Repeat New Password', validators=[DataRequired(), EqualTo('password')])
+    submit = SubmitField('Change Password')
+
+
+class SupportForm(FlaskForm):
+    subject = StringField('Subject', validators=[DataRequired(), Length(max=200)])
+    message = TextAreaField('Message', validators=[DataRequired(), Length(max=2000)])
+    submit = SubmitField('Send')
+
+
+class BookingRescheduleForm(FlaskForm):
+    date = DateField('New Date', validators=[DataRequired()], format='%Y-%m-%d')
+    time = TimeField('New Time', validators=[DataRequired()])
+    submit = SubmitField('Reschedule')
+
+
+class EnergyEntryForm(FlaskForm):
+    entry_date = DateField('Date', validators=[DataRequired()], format='%Y-%m-%d')
+    kwh = FloatField('kWh', validators=[DataRequired()])
+    submit = SubmitField('Add Entry')
+
+
+class EnergyGoalForm(FlaskForm):
+    daily_kwh_goal = FloatField('Daily kWh Goal', validators=[DataRequired()])
+    submit = SubmitField('Save Goal')

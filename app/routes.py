@@ -1,10 +1,10 @@
 from flask import Blueprint, render_template, flash, redirect, url_for, request, session, abort
 from urllib.parse import urlsplit
 from app import db, login
-from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm
+from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm, SettingsForm, ChangePasswordForm, SupportForm, BookingRescheduleForm, EnergyEntryForm, EnergyGoalForm
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
-from app.models import User, Booking, Product
+from app.models import User, Booking, Product, Basket, BasketItem, SupportMessage, EnergyEntry, EnergyGoal
 import datetime
 from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
@@ -24,6 +24,18 @@ bp = Blueprint('main', __name__)
 @bp.route('/basket')
 @login_required
 def basket():
+    # Ensure basket exists for user
+    basket = db.session.scalar(sa.select(Basket).where(Basket.user_id == current_user.id))
+    if basket:
+        # compute total and prepare items for template
+        total = 0
+        items = []
+        for it in basket.items:
+            prod = it.product
+            price = prod.price * (it.quantity or 1)
+            total += price
+            items.append({'id': it.id, 'name': prod.name, 'quantity': it.quantity, 'price': f"£{prod.price:.2f}", 'total': f"£{price:.2f}"})
+        return render_template('basket.html', basket={'items': items, 'total_price': f"£{total:.2f}"})
     return render_template('basket.html')
 
 # Load user for Flask-Login
@@ -48,6 +60,41 @@ def green_products():
         appliance_products=appliance_products
     )
 
+
+@bp.route('/basket/add/<int:product_id>')
+@login_required
+def add_to_basket(product_id):
+    product = Product.query.get_or_404(product_id)
+    basket = db.session.scalar(sa.select(Basket).where(Basket.user_id == current_user.id))
+    if not basket:
+        basket = Basket(user_id=current_user.id)
+        db.session.add(basket)
+        db.session.commit()
+
+    # check if item exists
+    item = db.session.scalar(sa.select(BasketItem).where(BasketItem.basket_id == basket.id).where(BasketItem.product_id == product.id))
+    if item:
+        item.quantity = (item.quantity or 1) + 1
+    else:
+        item = BasketItem(basket_id=basket.id, product_id=product.id, quantity=1)
+        db.session.add(item)
+
+    db.session.commit()
+    flash(f'Added {product.name} to your basket.')
+    return redirect(url_for('main.green_products'))
+
+
+@bp.route('/basket/remove/<int:item_id>', methods=['POST', 'GET'])
+@login_required
+def remove_from_basket(item_id):
+    item = BasketItem.query.get_or_404(item_id)
+    if not item.basket or item.basket.user_id != current_user.id:
+        abort(403)
+    db.session.delete(item)
+    db.session.commit()
+    flash('Item removed from basket.')
+    return redirect(url_for('main.basket'))
+
 @bp.route('/consultation', methods=['GET', 'POST'])
 def consultation():
     form = BookingForm()
@@ -68,9 +115,122 @@ def consultation():
     bookings = db.session.scalars(sa.select(Booking).order_by(Booking.appointment_datetime.desc())).all()
     return render_template('consultation.html', form=form, bookings=bookings)
 
-@bp.route('/energy_tracker')
+@bp.route('/energy_tracker', methods=['GET', 'POST'])
+@login_required
 def energy_tracker():
-    return render_template('energy_tracker.html')
+    entry_form = EnergyEntryForm()
+    goal_form = EnergyGoalForm()
+
+    # Add new energy entry
+    if entry_form.validate_on_submit() and entry_form.submit.data:
+        entry = EnergyEntry(user_id=current_user.id, entry_date=entry_form.entry_date.data, kwh=entry_form.kwh.data)
+        db.session.add(entry)
+        db.session.commit()
+        flash('Energy entry added.')
+        return redirect(url_for('main.energy_tracker'))
+
+    # Save/Update goal
+    if goal_form.validate_on_submit() and goal_form.submit.data:
+        goal = db.session.scalar(sa.select(EnergyGoal).where(EnergyGoal.user_id == current_user.id))
+        if not goal:
+            goal = EnergyGoal(user_id=current_user.id, daily_kwh_goal=goal_form.daily_kwh_goal.data)
+            db.session.add(goal)
+        else:
+            goal.daily_kwh_goal = goal_form.daily_kwh_goal.data
+        db.session.commit()
+        flash('Daily energy goal saved.')
+        return redirect(url_for('main.energy_tracker'))
+
+    # Load user's entries and goal
+    entries = db.session.scalars(sa.select(EnergyEntry).where(EnergyEntry.user_id == current_user.id).order_by(EnergyEntry.entry_date.desc())).all()
+    goal = db.session.scalar(sa.select(EnergyGoal).where(EnergyGoal.user_id == current_user.id))
+
+    # Simple tips based on latest entry
+    tips = []
+    latest = entries[0] if entries else None
+    if latest:
+        if latest.kwh > (goal.daily_kwh_goal or 0):
+            tips.append('Your latest day is above your goal — consider reducing appliance usage.')
+        else:
+            tips.append('You are within your goal — keep up the good work!')
+
+    # Summarize weekly average (last 7 entries by date)
+    recent = entries[:7]
+    avg = None
+    if recent:
+        avg = round(sum(e.kwh for e in recent) / len(recent), 2)
+
+    return render_template('energy_tracker.html', entry_form=entry_form, goal_form=goal_form, entries=entries, goal=goal, tips=tips, weekly_avg=avg)
+
+
+@bp.route('/settings', methods=['GET', 'POST'])
+@login_required
+def settings():
+    settings_form = SettingsForm(obj=current_user)
+    pwd_form = ChangePasswordForm()
+    support_form = SupportForm()
+
+    # Update basic settings
+    if settings_form.validate_on_submit():
+        current_user.name = settings_form.name.data
+        current_user.email = settings_form.email.data
+        db.session.commit()
+        flash('Settings updated.')
+        return redirect(url_for('main.settings'))
+
+    # Change password
+    if pwd_form.validate_on_submit():
+        if not current_user.check_password(pwd_form.current_password.data):
+            flash('Current password incorrect.', 'danger')
+        else:
+            current_user.set_password(pwd_form.password.data)
+            db.session.commit()
+            flash('Password changed successfully.')
+        return redirect(url_for('main.settings'))
+    # Send support message
+    if support_form.validate_on_submit():
+        msg = SupportMessage(user_id=current_user.id, subject=support_form.subject.data, message=support_form.message.data)
+        db.session.add(msg)
+        db.session.commit()
+        flash('Support message sent. Our team will contact you shortly.')
+        return redirect(url_for('main.settings'))
+
+    # User bookings to manage
+    user_bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.appointment_datetime.desc()).all()
+    return render_template('settings.html', settings_form=settings_form, pwd_form=pwd_form, support_form=support_form, bookings=user_bookings)
+
+
+@bp.route('/booking/cancel/<int:booking_id>', methods=['POST'])
+@login_required
+def cancel_booking(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+    if booking.user_id != current_user.id and not current_user.is_admin:
+        abort(403)
+    db.session.delete(booking)
+    db.session.commit()
+    flash('Booking cancelled.')
+    return redirect(url_for('main.settings'))
+
+
+@bp.route('/booking/reschedule/<int:booking_id>', methods=['GET', 'POST'])
+@login_required
+def reschedule_booking(booking_id):
+    booking = Booking.query.get_or_404(booking_id)
+    if booking.user_id != current_user.id and not current_user.is_admin:
+        abort(403)
+    form = BookingRescheduleForm()
+    if form.validate_on_submit():
+        new_dt = datetime.combine(form.date.data, form.time.data)
+        # check conflict
+        conflict = Booking.query.filter(Booking.appointment_datetime == new_dt).filter(Booking.id != booking.id).first()
+        if conflict:
+            flash('There is already a booking at that date/time. Please choose another.', 'danger')
+            return redirect(url_for('main.reschedule_booking', booking_id=booking.id))
+        booking.appointment_datetime = new_dt
+        db.session.commit()
+        flash('Booking rescheduled.')
+        return redirect(url_for('main.settings'))
+    return render_template('reschedule_booking.html', form=form, booking=booking)
 
 
 @bp.route('/dashboard')
