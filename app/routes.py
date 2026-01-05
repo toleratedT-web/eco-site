@@ -24,20 +24,63 @@ bp = Blueprint('main', __name__)
 @bp.route('/basket')
 @login_required
 def basket():
-    # Ensure basket exists for user
-    basket = db.session.scalar(sa.select(Basket).where(Basket.user_id == current_user.id))
-    if basket:
-        # compute total and prepare items for template
-        total = 0
-        items = []
-        for it in basket.items:
-            prod = it.product
-            price = prod.price * (it.quantity or 1)
-            total += price
-            items.append({'id': it.id, 'name': prod.name, 'quantity': it.quantity, 'price': f"£{prod.price:.2f}", 'total': f"£{price:.2f}"})
-        return render_template('basket.html', basket={'items': items, 'total_price': f"£{total:.2f}"})
-    return render_template('basket.html')
+    basket = db.session.scalar(
+        sa.select(Basket).where(Basket.user_id == current_user.id)
+    )
 
+    if not basket:
+        return render_template('basket.html', basket={'items': [], 'total_price': '£0.00'})
+
+    total = 0.0
+    items = []
+
+    for it in basket.items:
+        prod = it.product
+        quantity = it.quantity or 1
+        unit_price = float(prod.price)
+        line_total = unit_price * quantity
+
+        total += line_total
+
+        items.append({
+            'id': prod.id,
+            'name': prod.name,
+            'quantity': quantity,
+            'price': unit_price,       
+            'line_total': line_total, 
+            'image': prod.image_filename
+        })
+
+    return render_template(
+        'basket.html',
+        basket={
+            'items': items,
+            'total_price': total
+        }
+    )
+# add_to_basket
+@bp.route('/basket/add/<int:product_id>', methods=['POST'])
+@login_required
+def add_to_basket(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    basket = session.get('basket', {})
+
+    if str(product_id) in basket:
+        basket[str(product_id)]['quantity'] += 1
+    else:
+        basket[str(product_id)] = {
+            'quantity': 1,
+            'name': product.name,
+            'price': float(product.price),
+            'image': product.image_filename
+        }
+
+    session['basket'] = basket
+    session.modified = True
+
+    flash('Product added to basket!')
+    return redirect(url_for('main.green_products'))
 # Load user for Flask-Login
 @login.user_loader
 def load_user(id):
@@ -61,39 +104,6 @@ def green_products():
     )
 
 
-@bp.route('/basket/add/<int:product_id>')
-@login_required
-def add_to_basket(product_id):
-    product = Product.query.get_or_404(product_id)
-    basket = db.session.scalar(sa.select(Basket).where(Basket.user_id == current_user.id))
-    if not basket:
-        basket = Basket(user_id=current_user.id)
-        db.session.add(basket)
-        db.session.commit()
-
-    # check if item exists
-    item = db.session.scalar(sa.select(BasketItem).where(BasketItem.basket_id == basket.id).where(BasketItem.product_id == product.id))
-    if item:
-        item.quantity = (item.quantity or 1) + 1
-    else:
-        item = BasketItem(basket_id=basket.id, product_id=product.id, quantity=1)
-        db.session.add(item)
-
-    db.session.commit()
-    flash(f'Added {product.name} to your basket.')
-    return redirect(url_for('main.green_products'))
-
-
-@bp.route('/basket/remove/<int:item_id>', methods=['POST', 'GET'])
-@login_required
-def remove_from_basket(item_id):
-    item = BasketItem.query.get_or_404(item_id)
-    if not item.basket or item.basket.user_id != current_user.id:
-        abort(403)
-    db.session.delete(item)
-    db.session.commit()
-    flash('Item removed from basket.')
-    return redirect(url_for('main.basket'))
 
 @bp.route('/consultation', methods=['GET', 'POST'])
 def consultation():
@@ -497,3 +507,26 @@ def delete_product(product_id):
     flash('Product deleted successfully.')
     return redirect(url_for('main.admin_products'))
 
+from flask import session, redirect, url_for, request
+from app.models import Product
+
+@bp.route('/basket/update/<int:product_id>', methods=['POST'])
+def update_basket(product_id):
+    quantity = int(request.form.get('quantity', 1))
+    basket = session.get('basket', {})
+
+    if str(product_id) in basket:
+        basket[str(product_id)]['quantity'] = quantity
+
+    session['basket'] = basket
+    session.modified = True
+    return redirect(url_for('main.basket'))
+
+
+@bp.route('/basket/remove/<int:product_id>', methods=['POST'])
+def remove_from_basket(product_id):
+    basket = session.get('basket', {})
+    basket.pop(str(product_id), None)
+    session['basket'] = basket
+    session.modified = True
+    return redirect(url_for('main.basket'))

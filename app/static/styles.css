@@ -265,6 +265,7 @@ li {
     margin: 5px 0;
 }
 
+<<<<<<< HEAD
 /* Card Image Wrapper for hover effect */
 .card-image-wrapper {
     position: relative;
@@ -344,4 +345,82 @@ li {
     font-weight: 700;
     color: #388e3c;
     margin-top: 5px;
+=======
+/* ---------------- Basket Icon ---------------- */
+.navbar .basket-icon,
+.basket-icon {
+    width: 70px;
+    height: auto;
+    object-fit: contain;
+}
+
+.basket-container {
+    display: flex;
+    gap: 30px;
+}
+
+.basket-items {
+    flex: 3;
+}
+
+.basket-item {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    padding: 20px 0;
+    gap: 20px;
+}
+
+.basket-image img {
+    width: 140px;
+}
+
+.basket-details {
+    flex: 2;
+}
+
+.basket-details h3 {
+    margin: 0 0 5px;
+}
+
+.in-stock {
+    color: green;
+    font-size: 0.9rem;
+}
+
+.basket-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.link-button {
+    background: none;
+    border: none;
+    color: #007185;
+    cursor: pointer;
+}
+
+.link-button:hover {
+    text-decoration: underline;
+}
+
+.basket-price {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.basket-summary {
+    flex: 1;
+    border: 1px solid #ddd;
+    padding: 20px;
+    height: fit-content;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 10px;
+    background: #ffd814;
+    border: 1px solid #fcd200;
+    cursor: pointer;
+>>>>>>> 7d501f2ba39561a6197db66a5e1c8e145f8dfcf0
 }
