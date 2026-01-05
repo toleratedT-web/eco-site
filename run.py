@@ -2,7 +2,7 @@ from app import create_app, db  # Import the factory function that creates the a
 from app.models import User
 import sys
 import os
-from app import create_app
+
 
 
 

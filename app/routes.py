@@ -118,7 +118,7 @@ def reset_password_request():
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            send_password_reset_email(user)
+            send_password_reset_email(user)  # pass full User object
         flash('Check your email for instructions to reset your password.')
         return redirect(url_for('main.login_route'))
     return render_template('reset_password_request.html', form=form)
@@ -130,13 +130,16 @@ def reset_password(token):
         return redirect(url_for('main.home'))
     user = User.verify_reset_password_token(token)
     if not user:
+        flash('Invalid or expired token')
         return redirect(url_for('main.home'))
+
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user.set_password(form.password.data)
         db.session.commit()
         flash('Your password has been reset.')
         return redirect(url_for('main.login_route'))
+
     return render_template('reset_password.html', form=form)
 
 
