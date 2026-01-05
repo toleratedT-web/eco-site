@@ -14,5 +14,15 @@ class Config:
 
     SESSION_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_HTTPONLY = True
-    # Email sender for password reset
-    ADMINS = [os.environ.get('MAIL_DEFAULT_SENDER', 'noreply@example.com')]
+
+    # Email configuration
+    MAIL_SERVER = os.environ.get('MAIL_SERVER', 'localhost')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT', 1025))
+    MAIL_USE_TLS = False
+    MAIL_USE_SSL = False
+    MAIL_USERNAME = None    # No login for local debug server
+    MAIL_PASSWORD = None    # No login for local debug server
+    MAIL_DEFAULT_SENDER = 'test@example.com'
+
+    # Admin list for notifications
+    ADMINS = [MAIL_DEFAULT_SENDER]
