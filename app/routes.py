@@ -353,23 +353,44 @@ def footprint_dashboard():
     return render_template("footprint_dashboard.html", footprints=footprints)
 
 @bp.route('/carbon_calculator', methods=['GET', 'POST'])
-#@login_required - for logged users only
+# @login_required  # enable later if you want logged-in users only
 def carbon_calculator():
     form = FootprintForm()
-    if request.method == "POST":
-        if form.validate_on_submit():
-            footprint = Footprint(
-                name=form.name.data, #current_user.id - replace with this when logged in,
-                car_emission=round((form.car_emission.data * 0.21), 2),
-                electricity_usage=round((form.electricity_usage.data * 0.222), 2),
-                total_footprint=round(((form.car_emission.data * 0.21) + (form.electricity_usage.data * 0.222)), 2),
-                date = form.date.data
-            )
-            db.session.add(footprint)
-            db.session.commit()
-            return redirect(url_for('main.footprint_dashboard'))
 
-    return render_template('carbon_calculator.html', title='Carbon Footprint Calculator', form=form)
+    # --- Prefill name on GET for authenticated users ---
+    if request.method == 'GET' and current_user.is_authenticated:
+        if not form.name.data:
+            form.name.data = (
+                getattr(current_user, 'name', None)
+                or getattr(current_user, 'username', None)
+                or ''
+            )
+
+    # --- Handle POST ---
+    if form.validate_on_submit():
+        car_emission = round(form.car_emission.data * 0.21, 2)
+        electricity_emission = round(form.electricity_usage.data * 0.222, 2)
+        total_footprint = round(car_emission + electricity_emission, 2)
+
+        footprint = Footprint(
+            name=form.name.data,
+            car_emission=car_emission,
+            electricity_usage=electricity_emission,
+            total_footprint=total_footprint,
+            date=form.date.data
+        )
+
+        db.session.add(footprint)
+        db.session.commit()
+
+        return redirect(url_for('main.footprint_dashboard'))
+
+    return render_template(
+        'carbon_calculator.html',
+        title='Carbon Footprint Calculator',
+        form=form
+    )
+
 
 @bp.route("/delete/<id>", methods=["POST"])
 def delete(id):
