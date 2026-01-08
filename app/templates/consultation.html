@@ -3,7 +3,6 @@
 
 <title>Booking Page</title>
 <style>
-
   .form-container {
     margin-top: 20px;
     display: none;
@@ -21,6 +20,7 @@
 
 <h1>Book Your Appointment</h1>
 
+
 <label for="booking-type">Choose Booking Type:</label>
 <select id="booking-type">
   <option value="">-- Select --</option>
@@ -28,77 +28,111 @@
   <option value="installation">Installation</option>
 </select>
 
-<!-- Consultation Form -->
+<!-- ================= CONSULTATION FORM ================= -->
 <div id="consultation-form" class="form-container">
   <h2>Consultation Booking</h2>
-  <form>
-    <label for="consult-name">Name:</label>
-    <input type="text" id="consult-name" required>
 
-    <label for="consult-email">Email:</label>
-    <input type="email" id="consult-email" required>
+  <form method="POST">
+    {{ form.hidden_tag() }}
 
-    <label for="consult-date">Preferred Date:</label>
-    <input type="date" id="consult-date" required>
+    <label for="name">Name:</label>
+    {{ form.name(
+        id="consult-name",
+        placeholder="Your full name"
+    ) }}
 
-    <label for="consult-time">Preferred Time:</label>
-    <input type="time" id="consult-time" required>
+    <label for="email">Email:</label>
+    {{ form.email(
+        id="consult-email",
+        placeholder="you@example.com"
+    ) }}
+
+    <label for="date">Preferred Date:</label>
+    {{ form.date(id="consult-date") }}
+
+    <label for="time">Preferred Time:</label>
+    {{ form.time(id="consult-time") }}
+
+    <label for="notes">Additional Notes:</label>
+    {{ form.notes(rows=3) }}
 
     <button type="submit">Book Consultation</button>
   </form>
 </div>
 
-<!-- Installation Form -->
+<!-- ================= INSTALLATION FORM (OPTIONAL) ================= -->
 <div id="installation-form" class="form-container">
   <h2>Installation Booking</h2>
-  <form>
-    <label for="install-name">Name:</label>
-    <input type="text" id="install-name" required>
 
-    <label for="install-email">Email:</label>
-    <input type="email" id="install-email" required>
+  <form method="POST">
+    {{ form.hidden_tag() }}
 
-    <label for="install-address">Installation Address:</label>
-    <textarea id="install-address" rows="3" required></textarea>
+    <label for="name">Name:</label>
+    {{ form.name(
+        id="install-name"
+    ) }}
 
-    <label for="install-type">Type of Installation:</label>
-    <select id="install-type" required>
-      <option value="">-- Select --</option>
-      <option value="solar_panels">Solar Panels</option>
-      <option value="wind_turbine">EV Chargers</option>
-      <option value="insulation">Smart Home Products</option>
-    </select>
+    <label for="email">Email:</label>
+    {{ form.email(
+        id="install-email"
+    ) }}
 
-    <label for="install-date">Preferred Date:</label>
-    <input type="date" id="install-date" required>
+    <label for="notes">Installation Address / Details:</label>
+    {{ form.notes(rows=4) }}
 
-    <label for="install-time">Preferred Time:</label>
-    <input type="time" id="install-time" required>
+    <label for="date">Preferred Date:</label>
+    {{ form.date(id="install-date") }}
+
+    <label for="time">Preferred Time:</label>
+    {{ form.time(id="install-time") }}
 
     <button type="submit">Book Installation</button>
   </form>
 </div>
 
 <script>
+document.addEventListener('DOMContentLoaded', () => {
   const bookingType = document.getElementById('booking-type');
   const consultationForm = document.getElementById('consultation-form');
   const installationForm = document.getElementById('installation-form');
 
   bookingType.addEventListener('change', () => {
     const type = bookingType.value;
-    if (type === 'consultation') {
-      consultationForm.style.display = 'block';
-      installationForm.style.display = 'none';
-    } else if (type === 'installation') {
-      consultationForm.style.display = 'none';
-      installationForm.style.display = 'block';
-    } else {
-      consultationForm.style.display = 'none';
-      installationForm.style.display = 'none';
-    }
+    consultationForm.style.display = type === 'consultation' ? 'block' : 'none';
+    installationForm.style.display = type === 'installation' ? 'block' : 'none';
   });
-</script>
 
-</body>
+  function validateTime(input) {
+    const timeValue = input.value;
+    if (!timeValue) return;
+
+    const [hours, minutes] = timeValue.split(':').map(Number);
+
+    if (minutes % 30 !== 0) {
+      const correctedMinutes = minutes < 15 ? 0 : minutes < 45 ? 30 : 0;
+      const correctedHours = correctedMinutes === 0 && minutes > 45 ? hours + 1 : hours;
+
+      const newTime =
+        String(correctedHours).padStart(2, '0') +
+        ':' +
+        String(correctedMinutes).padStart(2, '0');
+
+      alert(`Invalid time! Adjusted to nearest 30-minute interval: ${newTime}`);
+      input.value = newTime;
+    }
+  }
+
+  const consultTime = document.getElementById('consult-time');
+  const installTime = document.getElementById('install-time');
+
+  if (consultTime) {
+    consultTime.addEventListener('change', () => validateTime(consultTime));
+  }
+
+  if (installTime) {
+    installTime.addEventListener('change', () => validateTime(installTime));
+  }
+});
+</script>
 
 {% endblock %}
