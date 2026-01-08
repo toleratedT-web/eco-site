@@ -105,3 +105,11 @@ class EnergyGoal(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True)
     daily_kwh_goal = db.Column(db.Float, nullable=True)
+
+class Footprint(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    car_emission = db.Column(db.Float(100), nullable=False)
+    electricity_usage = db.Column(db.Float(100), nullable=False)
+    total_footprint = db.Column(db.Float(100), nullable=False)
+    date = db.Column(db.Date, nullable=False)

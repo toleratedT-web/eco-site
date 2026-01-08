@@ -1,11 +1,13 @@
-from flask import Blueprint, render_template, flash, redirect, url_for, request, session, abort
+from flask import Blueprint, jsonify, render_template, flash, redirect, url_for, request, session, abort
 from urllib.parse import urlsplit
 from app import db, login
 from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm, SettingsForm, ChangePasswordForm, SupportForm, BookingRescheduleForm, EnergyEntryForm, EnergyGoalForm
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
-from app.models import User, Booking, Product, Basket, BasketItem, SupportMessage, EnergyEntry, EnergyGoal
+from sqlalchemy import func
+from app.models import User, Booking, Product, Footprint, Basket, BasketItem, SupportMessage, EnergyEntry, EnergyGoal
 import datetime
+from datetime import date
 from app.forms import ResetPasswordRequestForm
 from app.email import send_password_reset_email
 from datetime import datetime
@@ -289,8 +291,6 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-
-
 # Password reset request (user enters email)
 @bp.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
@@ -305,47 +305,84 @@ def reset_password_request():
         return redirect(url_for('main.login_route'))
     return render_template('reset_password_request.html', form=form)
 
-# Password reset with token
-@bp.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('main.home'))
-    user = User.verify_reset_password_token(token)
-    if not user:
-        flash('Invalid or expired token')
-        return redirect(url_for('main.home'))
 
-    form = ResetPasswordForm()
-    if form.validate_on_submit():
-        user.set_password(form.password.data)
-        db.session.commit()
-        flash('Your password has been reset.')
-        return redirect(url_for('main.login_route'))
+@bp.route("/footprint_dashboard")
+#@login_required - for logged users only
+def footprint_dashboard():
+    footprints = Footprint.query.order_by(Footprint.id).all()
+    return render_template("footprint_dashboard.html", footprints=footprints)
 
-    return render_template('reset_password.html', form=form)
-
-
-@bp.route('/calculate', methods=['GET', 'POST'])
-def calculate():
+@bp.route('/carbon_calculator', methods=['GET', 'POST'])
+#@login_required - for logged users only
+def carbon_calculator():
     form = FootprintForm()
-    if request.method == 'POST':
+    if request.method == "POST":
         if form.validate_on_submit():
-            car_emission_calculation = round(form.car_emission.data * 0.21, 2)
-            electricity_calculation = round(form.electricity_usage.data * 0.222, 2)
-            total = car_emission_calculation + electricity_calculation
-            session['car_emission'] = form.car_emission.data
-            session['electricity_usage'] = form.electricity_usage.data
-            session['total'] = total
-            return redirect(url_for('main.calculate'))
+            footprint = Footprint(
+                name=form.name.data, #current_user.id - replace with this when logged in,
+                car_emission=round((form.car_emission.data * 0.21), 2),
+                electricity_usage=round((form.electricity_usage.data * 0.222), 2),
+                total_footprint=round(((form.car_emission.data * 0.21) + (form.electricity_usage.data * 0.222)), 2),
+                date = form.date.data
+            )
+            db.session.add(footprint)
+            db.session.commit()
+            return redirect(url_for('main.footprint_dashboard'))
 
-    submitted_car_emission = session.pop('car_emission', None)
-    submitted_electricity_usage = session.pop('electricity_usage', None)
-    submitted_total = session.pop('total', None)
+    return render_template('carbon_calculator.html', title='Carbon Footprint Calculator', form=form)
 
-    return render_template('carbon_calculator.html', title='Carbon Footprint Calculator', form=form,
-                           submitted_car_emission=submitted_car_emission,
-                           submitted_electricity_usage=submitted_electricity_usage,
-                           submitted_total=submitted_total)
+@bp.route("/delete/<id>", methods=["POST"])
+def delete(id):
+    footprint = Footprint.query.get_or_404(id)
+    db.session.delete(footprint)
+    db.session.commit()
+    return redirect(url_for('main.footprint_dashboard'))
+
+@bp.route("/api/total-footprints")
+def total_footprints():
+    total = db.session.query(func.sum(Footprint.total_footprint)).scalar() or 0
+    return jsonify({"total_footprints": round(total, 2)})
+
+@bp.route("/api/top-five-footprints")
+def top_five_footprints():
+    results = (
+        db.session.query(Footprint.name, func.sum(Footprint.total_footprint))
+        .group_by(Footprint.name)
+        .order_by(func.sum(Footprint.total_footprint).desc())
+        .limit(5)
+        .all()
+    )
+
+    data = [
+        {"name": name, "total": total}
+        for name, total in results
+    ]
+    return jsonify(data)
+
+@bp.route("/api/footprints-recorded-today")
+def footprints_recorded_today():
+    total = (
+        db.session.query(func.count(Footprint.id))
+        .filter(Footprint.date == date.today())
+        .scalar()
+    )
+
+    return jsonify({"total": int(total or 0)})
+
+@bp.route("/api/footprints-per-day")
+def footprints_per_day():
+    results = (
+        db.session.query(Footprint.date, func.sum(Footprint.total_footprint))
+        .group_by(Footprint.date)
+        .order_by(Footprint.date)
+        .all()
+    )
+
+    data = [
+        {"date": date.isoformat(), "total": total}
+        for date, total in results
+    ]
+    return jsonify(data)
 
 @bp.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():

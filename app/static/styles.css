@@ -63,7 +63,17 @@
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
 }
 
-/* ---------------- Forms ---------------- */
+.delete-btn {
+    width: 100%;
+    margin-top: 0;
+    padding: 0;
+    background-color: transparent;
+    border-radius: 0px;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0.1); 
+    overflow: hidden;
+}
+
+/* General Form Styling */
 form {
     width: 100%;
     max-width: 600px;
@@ -181,7 +191,16 @@ footer {
     margin-bottom: 1rem;
 }
 
-/* ---------------- Category Tabs ---------------- */
+.content_dis {
+    display: none;  /* hide all content initially */
+
+    }
+li {
+    cursor: pointer;
+    margin: 5px 0;
+}
+
+/* Category tabs */
 .category-tabs {
     list-style: none;
     display: flex;
