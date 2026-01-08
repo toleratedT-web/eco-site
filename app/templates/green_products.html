@@ -32,9 +32,9 @@
                     <h5 class="card-title">{{ product.name }}</h5>
                     <p class="card-text text-muted small">{{ product.description }}</p>
                     <p class="fw-bold mt-auto mb-3">£{{ product.price }}</p>
-                    <a href="{{ url_for('main.add_to_basket', product_id=product.id) }}" class="btn btn-success w-100">
-                        Add to Basket
-                    </a>
+                    <form method="post" action="{{ url_for('main.add_to_basket', product_id=product.id) }}">
+                        <button type="submit" class="btn btn-success w-100">Add to Basket</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -58,9 +58,9 @@
                     <h5 class="card-title">{{ product.name }}</h5>
                     <p class="card-text text-muted small">{{ product.description }}</p>
                     <p class="fw-bold mt-auto mb-3">£{{ product.price }}</p>
-                    <a href="{{ url_for('main.add_to_basket', product_id=product.id) }}" class="btn btn-success w-100">
-                        Add to Basket
-                    </a>
+                    <form method="post" action="{{ url_for('main.add_to_basket', product_id=product.id) }}">
+                        <button type="submit" class="btn btn-success w-100">Add to Basket</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -84,9 +84,9 @@
                     <h5 class="card-title">{{ product.name }}</h5>
                     <p class="card-text text-muted small">{{ product.description }}</p>
                     <p class="fw-bold mt-auto mb-3">£{{ product.price }}</p>
-                    <a href="{{ url_for('main.add_to_basket', product_id=product.id) }}" class="btn btn-success w-100">
-                        Add to Basket
-                    </a>
+                    <form method="post" action="{{ url_for('main.add_to_basket', product_id=product.id) }}">
+                        <button type="submit" class="btn btn-success w-100">Add to Basket</button>
+                    </form>
                 </div>
             </div>
         </div>
