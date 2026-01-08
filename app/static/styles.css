@@ -466,3 +466,52 @@ li {
     height: 3px;
     background-color: #388e3c; /* green underline */
 }
+
+/* ---------------- Settings Sidebar (Edge-like) ---------------- */
+.settings-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+.settings-sidebar {
+    width: 260px;
+    background: #f7f7f8;
+    border-right: 1px solid rgba(0,0,0,0.06);
+    border-radius: 8px;
+    padding: 12px;
+    height: fit-content;
+}
+.settings-sidebar ul {
+    list-style: none;
+    padding: 8px;
+    margin: 0;
+}
+.settings-sidebar li {
+    margin: 6px 0;
+}
+.settings-sidebar a {
+    display: block;
+    padding: 10px 12px;
+    color: #111;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+}
+.settings-sidebar a:hover {
+    background: rgba(0,0,0,0.03);
+}
+.settings-sidebar a.active {
+    background: #e9f5ee;
+    color: #0b3d0b;
+}
+.settings-content {
+    flex: 1 1 auto;
+}
+.settings-section { margin-bottom: 18px; }
+.settings-section .card { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+@media (max-width: 900px) {
+    .settings-layout { flex-direction: column; }
+    .settings-sidebar { width: 100%; display: flex; overflow-x: auto; }
+    .settings-sidebar a { white-space: nowrap; }
+}

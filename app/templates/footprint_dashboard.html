@@ -79,9 +79,13 @@
                     <td>{{ footprint.total_footprint }} kg CO₂e</td>
                     <td>{{ footprint.date }}</td>
                     <td>
-                      <form class="delete-btn" method="post" action="{{ url_for('main.delete', id=footprint.id) }}" novalidate>
-                        <button type="submit" class="btn btn-sm">Delete</button>
-                      </form>
+                      {% if current_user.is_authenticated and current_user.is_admin %}
+                        <form class="delete-btn" method="post" action="{{ url_for('main.delete', id=footprint.id) }}" novalidate>
+                          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                      {% else %}
+                        <span class="text-muted">—</span>
+                      {% endif %}
                     </td>
                   </tr>
                 {% endfor %}
