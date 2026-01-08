@@ -101,11 +101,6 @@ class EnergyEntry(db.Model):
     created_at = db.Column(db.DateTime, server_default=sa.func.now())
 
 
-class EnergyGoal(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True)
-    daily_kwh_goal = db.Column(db.Float, nullable=True)
-
 class Footprint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False)

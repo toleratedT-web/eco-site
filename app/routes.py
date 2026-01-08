@@ -1,11 +1,11 @@
 from flask import Blueprint, jsonify, render_template, flash, redirect, url_for, request, session, abort
 from urllib.parse import urlsplit
 from app import db, login
-from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm, SettingsForm, ChangePasswordForm, SupportForm, BookingRescheduleForm, EnergyEntryForm, EnergyGoalForm
+from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm, SettingsForm, ChangePasswordForm, SupportForm, BookingRescheduleForm, EnergyEntryForm
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from sqlalchemy import func
-from app.models import User, Booking, Product, Footprint, Basket, BasketItem, SupportMessage, EnergyEntry, EnergyGoal
+from app.models import User, Booking, Product, Footprint, Basket, BasketItem, SupportMessage, EnergyEntry
 import datetime
 from datetime import date
 from app.forms import ResetPasswordRequestForm
@@ -17,7 +17,6 @@ import base64
 import os
 from werkzeug.utils import secure_filename
 from flask import current_app
-
 
 # Blueprint for routes
 bp = Blueprint('main', __name__)
@@ -60,6 +59,7 @@ def basket():
             'total_price': total
         }
     )
+
 # add_to_basket
 @bp.route('/basket/add/<int:product_id>', methods=['POST'])
 @login_required
@@ -83,11 +83,11 @@ def add_to_basket(product_id):
 
     flash('Product added to basket!')
     return redirect(url_for('main.green_products'))
+
 # Load user for Flask-Login
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
-
 
 @bp.route('/')
 def home():
@@ -104,8 +104,6 @@ def green_products():
         ev_products=ev_products,
         appliance_products=appliance_products
     )
-
-
 
 @bp.route('/consultation', methods=['GET', 'POST'])
 def consultation():
@@ -131,40 +129,17 @@ def consultation():
 @login_required
 def energy_tracker():
     entry_form = EnergyEntryForm()
-    goal_form = EnergyGoalForm()
 
     # Add new energy entry
-    if entry_form.validate_on_submit() and entry_form.submit.data:
+    if entry_form.validate_on_submit():
         entry = EnergyEntry(user_id=current_user.id, entry_date=entry_form.entry_date.data, kwh=entry_form.kwh.data)
         db.session.add(entry)
         db.session.commit()
         flash('Energy entry added.')
         return redirect(url_for('main.energy_tracker'))
 
-    # Save/Update goal
-    if goal_form.validate_on_submit() and goal_form.submit.data:
-        goal = db.session.scalar(sa.select(EnergyGoal).where(EnergyGoal.user_id == current_user.id))
-        if not goal:
-            goal = EnergyGoal(user_id=current_user.id, daily_kwh_goal=goal_form.daily_kwh_goal.data)
-            db.session.add(goal)
-        else:
-            goal.daily_kwh_goal = goal_form.daily_kwh_goal.data
-        db.session.commit()
-        flash('Daily energy goal saved.')
-        return redirect(url_for('main.energy_tracker'))
-
     # Load user's entries and goal
     entries = db.session.scalars(sa.select(EnergyEntry).where(EnergyEntry.user_id == current_user.id).order_by(EnergyEntry.entry_date.desc())).all()
-    goal = db.session.scalar(sa.select(EnergyGoal).where(EnergyGoal.user_id == current_user.id))
-
-    # Simple tips based on latest entry
-    tips = []
-    latest = entries[0] if entries else None
-    if latest:
-        if latest.kwh > (goal.daily_kwh_goal or 0):
-            tips.append('Your latest day is above your goal — consider reducing appliance usage.')
-        else:
-            tips.append('You are within your goal — keep up the good work!')
 
     # Summarize weekly average (last 7 entries by date)
     recent = entries[:7]
@@ -172,8 +147,7 @@ def energy_tracker():
     if recent:
         avg = round(sum(e.kwh for e in recent) / len(recent), 2)
 
-    return render_template('energy_tracker.html', entry_form=entry_form, goal_form=goal_form, entries=entries, goal=goal, tips=tips, weekly_avg=avg)
-
+    return render_template('energy_tracker.html', entry_form=entry_form, entries=entries, weekly_avg=avg)
 
 @bp.route('/settings', methods=['GET', 'POST'])
 @login_required
@@ -199,6 +173,7 @@ def settings():
             db.session.commit()
             flash('Password changed successfully.')
         return redirect(url_for('main.settings'))
+    
     # Send support message
     if support_form.validate_on_submit():
         msg = SupportMessage(user_id=current_user.id, subject=support_form.subject.data, message=support_form.message.data)
@@ -209,8 +184,8 @@ def settings():
 
     # User bookings to manage
     user_bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.appointment_datetime.desc()).all()
-    return render_template('settings.html', settings_form=settings_form, pwd_form=pwd_form, support_form=support_form, bookings=user_bookings)
-
+    user_entries = EnergyEntry.query.filter_by(user_id=current_user.id).order_by(EnergyEntry.entry_date.desc()).all()
+    return render_template('settings.html', settings_form=settings_form, pwd_form=pwd_form, support_form=support_form, bookings=user_bookings, entries=user_entries)
 
 @bp.route('/booking/cancel/<int:booking_id>', methods=['POST'])
 @login_required
@@ -223,6 +198,16 @@ def cancel_booking(booking_id):
     flash('Booking cancelled.')
     return redirect(url_for('main.settings'))
 
+@bp.route('/entry/delete/<int:entry_id>', methods=['POST'])
+@login_required
+def delete_entry(entry_id):
+    entry = EnergyEntry.query.get_or_404(entry_id)
+    if entry.user_id != current_user.id and not current_user.is_admin:
+        abort(403)
+    db.session.delete(entry)
+    db.session.commit()
+    flash('Energy Entry Deleted.')
+    return redirect(url_for('main.settings'))
 
 @bp.route('/booking/reschedule/<int:booking_id>', methods=['GET', 'POST'])
 @login_required
@@ -244,12 +229,10 @@ def reschedule_booking(booking_id):
         return redirect(url_for('main.settings'))
     return render_template('reschedule_booking.html', form=form, booking=booking)
 
-
 @bp.route('/dashboard')
 @login_required
 def dashboard():
     return render_template('dashboard.html', user=current_user)
-
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login_route():
@@ -269,12 +252,10 @@ def login_route():
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
-
 @bp.route('/logout')
 def logout_route():
     logout_user()
     return redirect(url_for('main.home'))
-
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -290,7 +271,6 @@ def register():
         return redirect(url_for('main.login_route'))
     return render_template('register.html', title='Register', form=form)
 
-
 # Password reset request (user enters email)
 @bp.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
@@ -305,21 +285,20 @@ def reset_password_request():
         return redirect(url_for('main.login_route'))
     return render_template('reset_password_request.html', form=form)
 
-
 @bp.route("/footprint_dashboard")
-#@login_required - for logged users only
+@login_required
 def footprint_dashboard():
     footprints = Footprint.query.order_by(Footprint.id).all()
     return render_template("footprint_dashboard.html", footprints=footprints)
 
 @bp.route('/carbon_calculator', methods=['GET', 'POST'])
-#@login_required - for logged users only
+@login_required
 def carbon_calculator():
     form = FootprintForm()
     if request.method == "POST":
         if form.validate_on_submit():
             footprint = Footprint(
-                name=form.name.data, #current_user.id - replace with this when logged in,
+                name=current_user.id, #current_user.id - replace with this when logged in,
                 car_emission=round((form.car_emission.data * 0.21), 2),
                 electricity_usage=round((form.electricity_usage.data * 0.222), 2),
                 total_footprint=round(((form.car_emission.data * 0.21) + (form.electricity_usage.data * 0.222)), 2),
@@ -468,7 +447,6 @@ def admin_products():
     return render_template('admin_products.html', products=products)
 
 # Admin: Add product
-# Admin: Add product
 @bp.route('/admin/product/add', methods=['GET', 'POST'])
 @login_required
 def add_product():
@@ -501,7 +479,6 @@ def add_product():
         return redirect(url_for('main.admin_products'))
 
     return render_template('admin_product_form.html', form=form, action='Add')
-
 
 # Admin: Edit product
 @bp.route('/admin/product/edit/<int:product_id>', methods=['GET', 'POST'])
@@ -558,7 +535,6 @@ def update_basket(product_id):
     session['basket'] = basket
     session.modified = True
     return redirect(url_for('main.basket'))
-
 
 @bp.route('/basket/remove/<int:product_id>', methods=['POST'])
 def remove_from_basket(product_id):

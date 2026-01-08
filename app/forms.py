@@ -111,8 +111,3 @@ class EnergyEntryForm(FlaskForm):
     entry_date = DateField('Date', validators=[DataRequired()], format='%Y-%m-%d')
     kwh = FloatField('kWh', validators=[DataRequired()])
     submit = SubmitField('Add Entry')
-
-
-class EnergyGoalForm(FlaskForm):
-    daily_kwh_goal = FloatField('Daily kWh Goal', validators=[DataRequired()])
-    submit = SubmitField('Save Goal')
