@@ -271,8 +271,12 @@ def settings():
         flash('Support message sent. Our team will contact you shortly.')
         return redirect(url_for('main.settings'))
 
-    # User bookings to manage
-    user_bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.appointment_datetime.desc()).all()
+    # Bookings to manage: admins see all bookings, users see only their own
+    if current_user.is_admin:
+        user_bookings = Booking.query.order_by(Booking.appointment_datetime.desc()).all()
+    else:
+        user_bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.appointment_datetime.desc()).all()
+
     return render_template('settings.html', settings_form=settings_form, pwd_form=pwd_form, support_form=support_form, bookings=user_bookings)
 
 
@@ -417,8 +421,12 @@ def carbon_calculator():
 
 
 @bp.route("/delete/<id>", methods=["POST"])
+@login_required
 def delete(id):
     footprint = Footprint.query.get_or_404(id)
+    # Only allow admins to delete footprint records
+    if not current_user.is_admin:
+        abort(403)
     db.session.delete(footprint)
     db.session.commit()
     return redirect(url_for('main.footprint_dashboard'))
