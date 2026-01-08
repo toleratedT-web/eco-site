@@ -1,0 +1,15 @@
+<h1>{{ action }} Product</h1>
+<form method="POST" enctype="multipart/form-data">
+    {{ form.csrf_token }}
+    <p>{{ form.name.label }} {{ form.name() }}</p>
+    <p>{{ form.description.label }} {{ form.description() }}</p>
+    <p>{{ form.category.label }} {{ form.category() }}</p>
+    <p>{{ form.price.label }} {{ form.price() }}</p>
+    <p>{{ form.image.label }} {{ form.image() }}</p>
+    <p>{{ form.submit() }}</p>
+</form>
+
+{% if product and product.image %}
+    <p>Current Image:</p>
+    <img src="data:{{ product.image_mimetype }};base64,{{ product.image | b64encode }}" width="150">
+{% endif %}

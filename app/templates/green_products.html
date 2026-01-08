@@ -18,7 +18,7 @@
         <h3>{{ product.name }}</h3>
         <p>{{ product.description }}</p>
         <p class="price">£{{ product.price }}</p>
-        <button class="btn-add">Add to Basket</button>
+        <a class="btn btn-success" href="{{ url_for('main.add_to_basket', product_id=product.id) }}">Add to Basket</a>
     </div>
     {% endfor %}
 </div>
@@ -31,7 +31,7 @@
         <h3>{{ product.name }}</h3>
         <p>{{ product.description }}</p>
         <p class="price">£{{ product.price }}</p>
-        <button class="btn-add">Add to Basket</button>
+        <a class="btn btn-success" href="{{ url_for('main.add_to_basket', product_id=product.id) }}">Add to Basket</a>
     </div>
     {% endfor %}
 </div>
@@ -44,7 +44,7 @@
         <h3>{{ product.name }}</h3>
         <p>{{ product.description }}</p>
         <p class="price">£{{ product.price }}</p>
-        <button class="btn-add">Add to Basket</button>
+        <a class="btn btn-success" href="{{ url_for('main.add_to_basket', product_id=product.id) }}">Add to Basket</a>
     </div>
     {% endfor %}
 </div>
@@ -57,5 +57,10 @@ window.showContent = function(id) {
     const selected = document.getElementById(id);
     if (selected) selected.style.display = 'grid'; // use grid for layout
 }
+
+// Show default category on page load (e.g., solar)
+document.addEventListener("DOMContentLoaded", function() {
+    window.showContent('solar'); // or 'ev' or 'appliances'
+});
 </script>
 {% endblock %}

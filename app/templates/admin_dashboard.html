@@ -1,15 +1,80 @@
 {% extends "base.html" %}
 {% block title %}Admin Dashboard{% endblock %}
-{% block content %}
-  <h1>Admin Dashboard</h1>
-  <p>Total bookings: {{ total }}</p>
-  <p>Upcoming: {{ upcoming }}</p>
-  <p>Past: {{ past }}</p>
 
-  <h2>Recent bookings</h2>
-  <ul>
-    {% for b in recent %}
-      <li>{{ b.name }} — {{ b.email }} — {% if b.appointment_datetime %}{{ b.appointment_datetime.strftime('%Y-%m-%d %H:%M') }}{% else %}pending{% endif %}</li>
-    {% endfor %}
-  </ul>
+{% block content %}
+<div class="container mt-4">
+
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <!-- Summary Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Total Bookings</h6>
+                    <h2>{{ total }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Upcoming</h6>
+                    <h2 class="text-success">{{ upcoming }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card text-center shadow-sm">
+                <div class="card-body">
+                    <h6 class="text-muted">Past</h6>
+                    <h2 class="text-secondary">{{ past }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Recent Bookings</h5>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-striped mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Date & Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for b in recent %}
+                    <tr>
+                        <td>{{ b.name }}</td>
+                        <td>{{ b.email }}</td>
+                        <td>
+                            {% if b.appointment_datetime %}
+                                {{ b.appointment_datetime.strftime('%Y-%m-%d %H:%M') }}
+                            {% else %}
+                                <span class="text-muted">Pending</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3" class="text-center text-muted">
+                            No recent bookings
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
 {% endblock %}

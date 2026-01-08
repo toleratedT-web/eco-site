@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">Shopping Basket</h1>
+
+    {% if basket['items'] %}
+    <div class="row">
+
+        <!-- LEFT: ITEMS -->
+        <div class="col-lg-8">
+            {% for item in basket['items'] %}
+            <div class="card mb-3 shadow-sm">
+                <div class="row g-0 align-items-center">
+
+                    <!-- Image -->
+                    <div class="col-4 col-md-3 text-center p-2">
+                        <img
+                            src="{{ url_for('static', filename='images/' ~ item.image) }}"
+                            class="img-fluid rounded"
+                            alt="{{ item.name }}"
+                            style="max-height: 120px;"
+                        >
+                    </div>
+
+                    <!-- Details -->
+                    <div class="col-8 col-md-6">
+                        <div class="card-body py-2">
+                            <h5 class="card-title mb-1">{{ item.name }}</h5>
+                            <p class="text-success mb-2 small">In stock</p>
+
+                            <div class="d-flex align-items-center gap-3 flex-wrap">
+
+                                <!-- Quantity -->
+                                <form action="{{ url_for('main.update_basket', product_id=item.id) }}" method="post" class="d-inline">
+                                    <select name="quantity"
+                                            class="form-select form-select-sm"
+                                            onchange="this.form.submit()">
+                                        {% for i in range(1, 11) %}
+                                            <option value="{{ i }}" {% if i == item.quantity %}selected{% endif %}>
+                                                Qty: {{ i }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+
+                                <!-- Delete -->
+                                <form action="{{ url_for('main.remove_from_basket', product_id=item.id) }}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-link btn-sm text-danger p-0">
+                                        Delete
+                                    </button>
+                                </form>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Price (desktop) -->
+                    <div class="col-md-3 text-end pe-4 d-none d-md-block">
+                        <strong>
+                            £{{ (item.price * item.quantity) | round(2) }}
+                        </strong>
+                    </div>
+
+                </div>
+
+                <!-- Price (mobile) -->
+                <div class="d-md-none text-end px-3 pb-2">
+                    <strong>
+                        £{{ (item.price * item.quantity) | round(2) }}
+                    </strong>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- RIGHT: SUMMARY -->
+        <div class="col-lg-4">
+            <div class="card shadow-sm sticky-lg-top" style="top: 80px;">
+                <div class="card-body">
+                    <h5 class="card-title">Order Summary</h5>
+                    <hr>
+
+                    <div class="d-flex justify-content-between mb-3">
+                        <span>Subtotal</span>
+                        <strong>
+                            £{{ basket.total_price | round(2) }}
+                        </strong>
+                    </div>
+
+                    <button class="btn btn-warning w-100 btn-lg">
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    {% else %}
+        <div class="alert alert-info">
+            Your basket is empty.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
