@@ -1,45 +1,80 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Calculate Carbon Footprint</h1>
-    <div class="container mt-4">
-        <form action="{{ url_for('main.carbon_calculator') }}" method="post" novalidate>
-            {{ form.csrf_token }}
-            <div class="mb-3">
-                {{ form.name.label(class="form-label") }}
-                {{ form.name(class="form-control", placeholder="Enter your name") }}
-                {% if form.name.errors %}
-                    <div class="invalid-feedback d-block">{{ form.name.errors[0] }}</div>
-                {% endif %}
-            </div>
+<h1>Calculate Carbon Footprint</h1>
 
-            <div class="mb-3">
-                {{ form.car_emission.label(class="form-label") }}
-                {{ form.car_emission(class="form-control", type="number") }}
-                {% if form.car_emission.errors %}
-                    <div class="invalid-feedback d-block">{{ form.car_emission.errors[0] }}</div>
-                {% endif %}
-            </div>
+<div class="container mt-4">
+    <form action="{{ url_for('main.carbon_calculator') }}" method="post" novalidate>
+        {{ form.hidden_tag() }}
 
-            <div class="mb-3">
-                {{ form.electricity_usage.label(class="form-label") }}
-                {{ form.electricity_usage(class="form-control", type="number") }}
-                {% if form.electricity_usage.errors %}
-                    <div class="invalid-feedback d-block">{{ form.electricity_usage.errors[0] }}</div>
-                {% endif %}
-            </div>
+        <!-- ================= NAME ================= -->
+        <div class="mb-3">
+            {{ form.name.label(class="form-label") }}
 
-            <div class="mb-3">
-                {{ form.date.label(class="form-label") }}
-                {{ form.date(class="form-control", type="date") }}
-                {% if form.date.errors %}
-                    <div class="invalid-feedback d-block">{{ form.date.errors[0] }}</div>
-                {% endif %}
-            </div>
+            {{ form.name(
+                class="form-control" + (" is-invalid" if form.name.errors else ""),
+                placeholder="Enter your name"
+            ) }}
 
-            <div class="d-flex gap-2">
-                {{ form.submit(class="btn btn-success") }}
-            </div>
-        </form>
-    </div>
+            {% if form.name.errors %}
+                <div class="invalid-feedback">
+                    {{ form.name.errors[0] }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ================= CAR EMISSIONS ================= -->
+        <div class="mb-3">
+            {{ form.car_emission.label(class="form-label") }}
+
+            {{ form.car_emission(
+                class="form-control" + (" is-invalid" if form.car_emission.errors else ""),
+                type="number"
+            ) }}
+
+            {% if form.car_emission.errors %}
+                <div class="invalid-feedback">
+                    {{ form.car_emission.errors[0] }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ================= ELECTRICITY ================= -->
+        <div class="mb-3">
+            {{ form.electricity_usage.label(class="form-label") }}
+
+            {{ form.electricity_usage(
+                class="form-control" + (" is-invalid" if form.electricity_usage.errors else ""),
+                type="number"
+            ) }}
+
+            {% if form.electricity_usage.errors %}
+                <div class="invalid-feedback">
+                    {{ form.electricity_usage.errors[0] }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ================= DATE ================= -->
+        <div class="mb-3">
+            {{ form.date.label(class="form-label") }}
+
+            {{ form.date(
+                class="form-control" + (" is-invalid" if form.date.errors else ""),
+                type="date"
+            ) }}
+
+            {% if form.date.errors %}
+                <div class="invalid-feedback">
+                    {{ form.date.errors[0] }}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ================= SUBMIT ================= -->
+        <div class="d-flex gap-2">
+            {{ form.submit(class="btn btn-success") }}
+        </div>
+    </form>
+</div>
 {% endblock %}
