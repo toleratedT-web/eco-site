@@ -265,87 +265,6 @@ li {
     margin: 5px 0;
 }
 
-<<<<<<< HEAD
-/* Card Image Wrapper for hover effect */
-.card-image-wrapper {
-    position: relative;
-    overflow: hidden;
-    border-radius: 12px;
-}
-
-.card-image-wrapper img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-    border-radius: 12px;
-}
-
-/* Zoom and lift on hover */
-.product-card:hover img {
-    transform: scale(1.05);
-}
-
-/* Card Actions (edit/delete) */
-.card-actions {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    display: flex;
-    gap: 8px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.product-card:hover .card-actions {
-    opacity: 1;
-}
-
-.card-actions a,
-.card-actions button {
-    background: rgba(255, 255, 255, 0.85);
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1rem;
-    color: #333;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.2s;
-}
-
-.card-actions a:hover,
-.card-actions button:hover {
-    background: #f1f1f1;
-    transform: scale(1.1);
-}
-
-/* Product Info */
-.product-info {
-    padding: 10px 0 0;
-    text-align: center;
-}
-
-.product-info h3 {
-    margin: 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #1b5e20;
-}
-
-.product-info .category {
-    font-size: 0.9rem;
-    color: #555;
-}
-
-.product-info .price {
-    font-weight: 700;
-    color: #388e3c;
-    margin-top: 5px;
-=======
 /* ---------------- Basket Icon ---------------- */
 .navbar .basket-icon,
 .basket-icon {
@@ -422,5 +341,4 @@ li {
     background: #ffd814;
     border: 1px solid #fcd200;
     cursor: pointer;
->>>>>>> 7d501f2ba39561a6197db66a5e1c8e145f8dfcf0
 }
