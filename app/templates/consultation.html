@@ -8,7 +8,7 @@
     display: none;
   }
 
-  input, select, textarea, button {
+  input, select, textarea, .book-btn {
     padding: 8px;
     width: 100%;
     max-width: 400px;
@@ -56,7 +56,7 @@
     <label for="notes">Additional Notes:</label>
     {{ form.notes(rows=3) }}
 
-    <button type="submit">Book Consultation</button>
+    <button type="submit" class="book-btn">Book Consultation</button>
   </form>
 </div>
 
@@ -86,7 +86,7 @@
     <label for="time">Preferred Time:</label>
     {{ form.time(id="install-time") }}
 
-    <button type="submit">Book Installation</button>
+    <button type="submit" class="book-btn">Book Installation</button>
   </form>
 </div>
 

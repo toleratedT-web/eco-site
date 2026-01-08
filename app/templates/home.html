@@ -3,9 +3,19 @@
 {% block title %}Home - Rolsa Technologies{% endblock %}
 
 {% block content %}
+
 <style>
-    .hero { background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url('{{ url_for('static', filename='images/solar_panels.jpg') }}') center/cover no-repeat; padding: 6rem 0; color: #fff; }
-    .hero .overlay { background: rgba(0,0,0,0.35); padding: 2rem; border-radius: 8px; }
+    .hero {
+        background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
+                    url("{{ url_for('static', filename='images/solar_panels.jpg') }}") center/cover no-repeat;
+        padding: 6rem 0;
+        color: #fff;
+    }
+    .hero .overlay {
+        background: rgba(0,0,0,0.35);
+        padding: 2rem;
+        border-radius: 8px;
+    }
     .card-brief { min-height: 140px; }
 </style>
 
