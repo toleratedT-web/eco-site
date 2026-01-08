@@ -459,13 +459,17 @@ def admin_manage_users():
     return render_template('admin_manage_users.html', users=users)
 
 # Admin: List all products
+from app.forms import ProductForm
+
 @bp.route('/admin/products')
 @login_required
 def admin_products():
     if not current_user.is_admin:
         abort(403)
+
     products = Product.query.all()
-    return render_template('admin_products.html', products=products)
+    form = ProductForm()  # <-- add this line
+    return render_template('admin_products.html', products=products, form=form)
 
 # Admin: Add product
 # Admin: Add product
