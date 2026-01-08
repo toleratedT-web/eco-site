@@ -17,6 +17,7 @@ import base64
 import os
 from werkzeug.utils import secure_filename
 from flask import current_app
+from app.models import User
 
 
 # Blueprint for routes
@@ -106,12 +107,43 @@ def green_products():
     )
 
 
-
 @bp.route('/consultation', methods=['GET', 'POST'])
 def consultation():
     form = BookingForm()
+
+    # --- Prefill name/email on GET when user is authenticated ---
+    if request.method == 'GET' and current_user.is_authenticated:
+        # Only set defaults if fields are empty
+        if not form.name.data:
+            # Prefer 'name', fall back to 'username' if needed
+            form.name.data = (
+                getattr(current_user, 'name', None)
+                or getattr(current_user, 'username', None)
+                or ''
+            )
+
+        if not form.email.data:
+            form.email.data = getattr(current_user, 'email', '') or ''
+
+    # --- Handle POST ---
     if form.validate_on_submit():
-        appointment_dt = datetime.combine(form.date.data, form.time.data)
+        selected_time = form.time.data  # datetime.time
+
+        if selected_time is None:
+            flash('Please select a valid time.', 'error')
+            return render_template('consultation.html', form=form)
+
+        if selected_time.minute % 30 != 0:
+            flash(
+                'Please select a time in 30-minute intervals '
+                '(e.g., 09:00, 09:30, 10:00).',
+                'error'
+            )
+            return render_template('consultation.html', form=form)
+
+        # Combine date + time into a single datetime
+        appointment_dt = datetime.combine(form.date.data, selected_time)
+
         booking = Booking(
             user_id=current_user.id if current_user.is_authenticated else None,
             name=form.name.data,
@@ -119,13 +151,21 @@ def consultation():
             appointment_datetime=appointment_dt,
             notes=form.notes.data,
         )
+
         db.session.add(booking)
         db.session.commit()
-        flash('Your booking request has been submitted. We will contact you to confirm.')
+
+        flash(
+            'Your booking request has been submitted. '
+            'We will contact you to confirm.',
+            'success'
+        )
         return redirect(url_for('main.consultation'))
 
-    bookings = db.session.scalars(sa.select(Booking).order_by(Booking.appointment_datetime.desc())).all()
-    return render_template('consultation.html', form=form, bookings=bookings)
+    # --- Render page ---
+    return render_template('consultation.html', form=form)
+
+
 
 @bp.route('/energy_tracker', methods=['GET', 'POST'])
 @login_required
