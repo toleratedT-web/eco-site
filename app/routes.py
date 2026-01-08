@@ -31,8 +31,32 @@ def basket():
         sa.select(Basket).where(Basket.user_id == current_user.id)
     )
 
+    # If there's no persistent basket for the user, fall back to session-based basket
     if not basket:
-        return render_template('basket.html', basket={'items': [], 'total_price': '£0.00'})
+        sess_basket = session.get('basket')
+        if sess_basket:
+            items = []
+            total = 0.0
+            for pid, info in sess_basket.items():
+                qty = int(info.get('quantity', 1))
+                price = float(info.get('price', 0.0))
+                line_total = price * qty
+                total += line_total
+                items.append({
+                    'id': int(pid),
+                    'name': info.get('name'),
+                    'quantity': qty,
+                    'price': price,
+                    'line_total': line_total,
+                    'image': info.get('image')
+                })
+
+            return render_template('basket.html', basket={
+                'items': items,
+                'total_price': total
+            })
+
+        return render_template('basket.html', basket={'items': [], 'total_price': 0.0})
 
     total = 0.0
     items = []
@@ -520,13 +544,17 @@ def admin_manage_users():
     return render_template('admin_manage_users.html', users=users)
 
 # Admin: List all products
+from app.forms import ProductForm
+
 @bp.route('/admin/products')
 @login_required
 def admin_products():
     if not current_user.is_admin:
         abort(403)
+
     products = Product.query.all()
-    return render_template('admin_products.html', products=products)
+    form = ProductForm()  # <-- add this line
+    return render_template('admin_products.html', products=products, form=form)
 
 # Admin: Add product
 # Admin: Add product
