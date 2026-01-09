@@ -3,17 +3,7 @@
 
 {% block content %}
     <h1>Register</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, msg in messages %}
-                {% if category in ['error', 'danger'] %}
-                    <div class="alert alert-danger">{{ msg }}</div>
-                {% else %}
-                    <div class="alert alert-{{ category }}">{{ msg }}</div>
-                {% endif %}
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+    
 
     <form method="post">
         {{ form.hidden_tag() }}
