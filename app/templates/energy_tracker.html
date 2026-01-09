@@ -3,11 +3,25 @@
 
 {% block content %}
     <h1>Energy Tracker</h1>
-    <p>Monitor and manage your energy consumption with our comprehensive energy tracking tools. Our platform allows you to log your energy usage, set goals for reduction, and receive personalized tips to improve your energy efficiency.</p>
-    <ul>
-        <li>Log Daily Energy Consumption</li>
-        <li>Set Reduction Goals</li>
-        <li>Receive Personalized Energy-Saving Tips</li>
-        <li>View Progress Over Time</li>
-    </ul>
+    <p>Log your daily consumption</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Add Energy Entry</h4>
+            <form method="post">
+                {{ entry_form.hidden_tag() }}
+                <div class="mb-3">
+                    {{ entry_form.entry_date.label }}
+                    {{ entry_form.entry_date(class='form-control') }}
+                </div>
+                <div class="mb-3">
+                    {{ entry_form.kwh.label }}
+                    {{ entry_form.kwh(class='form-control') }}
+                </div>
+                <div class="d-flex gap-2">
+                    {{ entry_form.submit(class="btn btn-success") }}
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}

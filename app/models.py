@@ -1,14 +1,18 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 from typing import Optional
-from app import db, login
+from app import db, login 
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from . import db
+from time import time
+import jwt
+from app import app
 
 #Admin
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(120), nullable=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(128), nullable=False)
@@ -19,21 +23,24 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
-    
+
+    def get_reset_password_token(self, expires_in=600):
+        secret = str(app.config['SECRET_KEY'])
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            secret, algorithm='HS256')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return db.session.get(User, id)
 
 
-#class User(UserMixin, db.Model):
-#    id: so.Mapped[int] = so.mapped_column(primary_key=True)
-#    username: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
-#    email: so.Mapped[str] = so.mapped_column(sa.String(120), index=True, unique=True)
-#    password_hash: so.Mapped[Optional[str]] = so.mapped_column(sa.String(256))
-#    is_admin = db.Column(db.Boolean, default=False)
 
-#    def set_password(self, password):
-#        self.password_hash = generate_password_hash(password)
-#
-#    def check_password(self, password):
-#        return check_password_hash(self.password_hash, password)
 
 @login.user_loader
 def load_user(id):
@@ -61,6 +68,38 @@ class Product(db.Model):
     image_filename = db.Column(db.String(100), nullable=False)
     category = db.Column(db.String(50), nullable=False)  # 'solar', 'ev', 'appliances'
     price = db.Column(db.Float, nullable=False)  # price in your currency
+
+
+class Basket(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False, unique=True)
+    user = db.relationship('User', backref=db.backref('basket', uselist=False))
+
+
+class BasketItem(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    basket_id = db.Column(db.Integer, db.ForeignKey('basket.id'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    quantity = db.Column(db.Integer, nullable=False, default=1)
+    product = db.relationship('Product')
+    basket = db.relationship('Basket', backref=db.backref('items', lazy='joined'))
+
+
+class SupportMessage(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
+    subject = db.Column(db.String(200), nullable=False)
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=sa.func.now())
+
+
+class EnergyEntry(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    entry_date = db.Column(db.Date, nullable=False)
+    kwh = db.Column(db.Float, nullable=False)
+    created_at = db.Column(db.DateTime, server_default=sa.func.now())
+
 
 class Footprint(db.Model):
     id = db.Column(db.Integer, primary_key=True)
