@@ -3,16 +3,26 @@
 {% block title %}Home - Rolsa Technologies{% endblock %}
 
 {% block content %}
+
 <style>
-    .hero { background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)), url('{{ url_for('static', filename='images/solar_panels.jpg') }}') center/cover no-repeat; padding: 6rem 0; color: #fff; }
-    .hero .overlay { background: rgba(0,0,0,0.35); padding: 2rem; border-radius: 8px; }
+    .hero {
+        background: linear-gradient(rgba(0,0,0,0.25), rgba(0,0,0,0.25)),
+                    url("{{ url_for('static', filename='images/solar_panels.jpg') }}") center/cover no-repeat;
+        padding: 6rem 0;
+        color: #fff;
+    }
+    .hero .overlay {
+        background: rgba(0,0,0,0.35);
+        padding: 2rem;
+        border-radius: 8px;
+    }
     .card-brief { min-height: 140px; }
 </style>
 
 <section class="hero d-flex align-items-center">
     <div class="container">
         <div class="overlay mx-auto text-center" style="max-width:900px;">
-            <h1 class="display-5 fw-bold">Sustainable Energy & Carbon Solutions</h1>
+            <h1 class="display-5 fw-bold">Rolsa Technologies - Sustainable Energy & Carbon Solutions</h1>
             <p class="lead">Helping businesses and homeowners reduce emissions, save energy, and transition to renewables.</p>
             <div class="mt-4">
                 <a href="{{ url_for('main.carbon_calculator') }}" class="btn btn-success btn-lg me-2">Calculate My Footprint</a>
@@ -54,7 +64,7 @@
                     <li>Transparent pricing and ROI estimates</li>
                     <li>Experienced installation and support</li>
                 </ul>
-                <a href="{{ url_for('main.carbon_calculator') }}" class="btn btn-success">Start Your Assessment</a>
+                <a href="{{ url_for('main.energy_tracker') }}" class="btn btn-success">Start Your Assessment</a>
             </div>
             <div class="col-md-6">
                 <img src="{{ url_for('static', filename='images/solar_panels.jpg') }}" alt="Solar panels" class="img-fluid rounded shadow">

@@ -1,65 +1,138 @@
 {% extends "base.html" %}
-{% block title %}Book a Consultation{% endblock %}
-
 {% block content %}
-    <h1>Book a Consultation</h1>
-    <p>Schedule a personalized consultation with our sustainability experts to discuss how you can reduce your carbon footprint and implement eco-friendly practices in your daily life or business.</p>
 
-    <div class="booking-form">
-        <h2>Request a Booking</h2>
-        <form method="post">
-            {{ form.hidden_tag() }}
-            <div>
-                {{ form.name.label }}<br>
-                {{ form.name(size=40) }}
-                {% for err in form.name.errors %}<div class="error">{{ err }}</div>{% endfor %}
-            </div>
-            <div>
-                {{ form.email.label }}<br>
-                {{ form.email(size=40) }}
-                {% for err in form.email.errors %}<div class="error">{{ err }}</div>{% endfor %}
-            </div>
-            <div>
-                {{ form.date.label }}<br>
-                {{ form.date() }}
-                {% for err in form.date.errors %}<div class="error">{{ err }}</div>{% endfor %}
-            </div>
-            <div>
-                {{ form.time.label }}<br>
-                {{ form.time() }}
-                {% for err in form.time.errors %}<div class="error">{{ err }}</div>{% endfor %}
-            </div>
-            <div>
-                {{ form.notes.label }}<br>
-                {{ form.notes(rows=4, cols=50) }}
-                {% for err in form.notes.errors %}<div class="error">{{ err }}</div>{% endfor %}
-            </div>
-            <div>
-                {{ form.submit(class_='btn btn-primary') }}
-            </div>
-        </form>
-    </div>
+<title>Booking Page</title>
+<style>
+  .form-container {
+    margin-top: 20px;
+    display: none;
+  }
 
-    <hr>
+  input, select, textarea, .book-btn {
+    padding: 8px;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 10px;
+  }
+</style>
+</head>
+<body>
 
-    <div class="bookings-list">
-        <h2>Requested Bookings</h2>
-        {% if bookings and bookings|length > 0 %}
-            <ul>
-            {% for b in bookings %}
-                <li>
-                    <strong>{{ b.name }}</strong> — {{ b.email }} —
-                    {% if b.appointment_datetime %}
-                        {{ b.appointment_datetime.strftime('%Y-%m-%d %H:%M') }}
-                    {% else %}
-                        Date/time pending
-                    {% endif %}
-                    {% if b.notes %}<br>Notes: {{ b.notes }}{% endif %}
-                </li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No bookings yet.</p>
-        {% endif %}
-    </div>
+<h1>Book Your Appointment</h1>
+
+
+<label for="booking-type">Choose Booking Type:</label>
+<select id="booking-type">
+  <option value="">-- Select --</option>
+  <option value="consultation">Consultation</option>
+  <option value="installation">Installation</option>
+</select>
+
+<!-- ================= CONSULTATION FORM ================= -->
+<div id="consultation-form" class="form-container">
+  <h2>Consultation Booking</h2>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <label for="name">Name:</label>
+    {{ form.name(
+        id="consult-name",
+        placeholder="Your full name"
+    ) }}
+
+    <label for="email">Email:</label>
+    {{ form.email(
+        id="consult-email",
+        placeholder="you@example.com"
+    ) }}
+
+    <label for="date">Preferred Date:</label>
+    {{ form.date(id="consult-date") }}
+
+    <label for="time">Preferred Time:</label>
+    {{ form.time(id="consult-time") }}
+
+    <label for="notes">Additional Notes:</label>
+    {{ form.notes(rows=3) }}
+
+    <button type="submit" class="book-btn">Book Consultation</button>
+  </form>
+</div>
+
+<!-- ================= INSTALLATION FORM (OPTIONAL) ================= -->
+<div id="installation-form" class="form-container">
+  <h2>Installation Booking</h2>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <label for="name">Name:</label>
+    {{ form.name(
+        id="install-name"
+    ) }}
+
+    <label for="email">Email:</label>
+    {{ form.email(
+        id="install-email"
+    ) }}
+
+    <label for="notes">Installation Address / Details:</label>
+    {{ form.notes(rows=4) }}
+
+    <label for="date">Preferred Date:</label>
+    {{ form.date(id="install-date") }}
+
+    <label for="time">Preferred Time:</label>
+    {{ form.time(id="install-time") }}
+
+    <button type="submit" class="book-btn">Book Installation</button>
+  </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const bookingType = document.getElementById('booking-type');
+  const consultationForm = document.getElementById('consultation-form');
+  const installationForm = document.getElementById('installation-form');
+
+  bookingType.addEventListener('change', () => {
+    const type = bookingType.value;
+    consultationForm.style.display = type === 'consultation' ? 'block' : 'none';
+    installationForm.style.display = type === 'installation' ? 'block' : 'none';
+  });
+
+  function validateTime(input) {
+    const timeValue = input.value;
+    if (!timeValue) return;
+
+    const [hours, minutes] = timeValue.split(':').map(Number);
+
+    if (minutes % 30 !== 0) {
+      const correctedMinutes = minutes < 15 ? 0 : minutes < 45 ? 30 : 0;
+      const correctedHours = correctedMinutes === 0 && minutes > 45 ? hours + 1 : hours;
+
+      const newTime =
+        String(correctedHours).padStart(2, '0') +
+        ':' +
+        String(correctedMinutes).padStart(2, '0');
+
+      alert(`Invalid time! Adjusted to nearest 30-minute interval: ${newTime}`);
+      input.value = newTime;
+    }
+  }
+
+  const consultTime = document.getElementById('consult-time');
+  const installTime = document.getElementById('install-time');
+
+  if (consultTime) {
+    consultTime.addEventListener('change', () => validateTime(consultTime));
+  }
+
+  if (installTime) {
+    installTime.addEventListener('change', () => validateTime(installTime));
+  }
+});
+</script>
+
 {% endblock %}

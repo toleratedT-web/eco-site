@@ -5,95 +5,93 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Rolsa Technologies{% endblock %}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Link to External Custom CSS -->
-    <link rel="stylesheet" href="static/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
-<body>
-    <div class="wrapper"> <!-- Flex wrapper to manage layout -->
+
+<body class="d-flex flex-column min-vh-100">
+
+    <div class="wrapper d-flex flex-column flex-grow-1">
+
+        <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-dark bg-success">
-  <div class="container-fluid">
+            <div class="container-fluid">
 
-    <!-- Brand on the LEFT -->
+                <a href="{{ url_for('main.home') }}">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}"
+                         alt="Rolsa Technologies Logo"
+                         width="200">
+                </a>
 
-    <a href="{{ url_for('main.home') }}">
-    <img src="{{ url_for('static', filename='images/logo.png') }}" 
-         alt="Rolsa Technologies Logo" 
-         width="200">
-    </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#rolsaNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
 
-
-
-
-    <!-- Mobile Toggle Button -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#rolsaNavbar"
-      aria-controls="rolsaNavbar" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <!-- Navbar Links -->
-    <div class="collapse navbar-collapse" id="rolsaNavbar">
-
-      <!-- Left Links -->
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" href="{{ url_for('main.home') }}">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('main.green_products')}}">Green Products</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('main.carbon_calculator') }}">Carbon Calculator</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('main.consultation')}}">Book a Consultation</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('main.energy_tracker') }}">Energy Tracker</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url_for('main.footprint_dashboard') }}">Footprint Dashboard</a>
+                <div class="collapse navbar-collapse" id="rolsaNavbar">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.home') }}">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.green_products') }}">Green Products</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.carbon_calculator') }}">Carbon Calculator</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.consultation') }}">Bookings</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('main.energy_tracker') }}">Energy Tracker</a></li>
+                      <li class="nav-item">
+          
         </li>
       </ul>
 
-      <!-- Right Side (Account) -->
-      <div class="d-flex align-items-center">
-        {% if current_user.is_anonymous %}
-          <a href="{{ url_for('main.login_route') }}" class="btn btn-outline-light me-2">Login</a>
-          <a href="{{ url_for('main.register') }}" class="btn btn-light text-success">Register</a>
-        {% else %}
-          {% if current_user.is_admin %}
-            <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-warning me-2">Admin Dashboard</a>
-            <a href="{{ url_for('main.admin_manage_users') }}" class="btn btn-warning me-2">Manage Users</a>
-          {% endif %}
-          <a href ="{{ url_for('main.logout_route') }}" class="btn btn-outline-light me-2">Logout</a>
-        {% endif %}
-      </div>
+                    <div class="d-flex align-items-center">
+                        {% if current_user.is_anonymous %}
+                            <a href="{{ url_for('main.login_route') }}" class="btn btn-outline-light me-2">Login</a>
+                            <a href="{{ url_for('main.register') }}" class="btn btn-light text-success">Register</a>
+                        {% else %}
+                        <a href="{{ url_for('main.basket') }}" class="me-3 basket-link d-flex align-items-center" title="View Basket">
+                            <img src="{{ url_for('static', filename='images/basket.png') }}" alt="Basket" width="32" height="32" class="basket-icon">
+                        </a>
+                        <div class="dropdown">
+                            <a class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" href="#" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <img src="{{ url_for('static', filename='images/profile_picture.png') }}" alt="Profile" width="40" height="40" class="rounded-circle me-2">
+                                <span>{{ current_user.username }}</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                {% if current_user.is_admin %}
+                                    <li><a class="dropdown-item" href="{{ url_for('main.admin_dashboard') }}">Bookings Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.footprint_dashboard') }}">Footprint Dashboard</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.admin_manage_users') }}">Manage Users</a></li>
+                                    <li><a class="dropdown-item" href="{{ url_for('main.admin_products') }}">Products</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                {% endif %}
+                                <li><a class="dropdown-item" href="{{ url_for('main.settings') }}">Settings</a></li>
+                                <li><a class="dropdown-item" href="{{ url_for('main.logout_route') }}">Logout</a></li>
+                            </ul>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
 
-    </div>
-  </div>
-</nav>
-
-        <!-- Main Content -->
-        <div class="content">
+        <!-- Page Content -->
+        <main class="content flex-grow-1">
             {% block content %}{% endblock %}
-        </div>
+        </main>
 
         <!-- Footer -->
-        <footer class="bg-dark text-white text-center py-2 mt-5" style="font-size: 0.9rem;">
+        <footer class="bg-dark text-white text-center py-2 mt-auto" style="font-size: 0.9rem;">
             <div class="container">
                 <span>&copy; 2025 Rolsa Technologies</span>
                 <span class="mx-2">|</span>
-                <a href="#" id="policy-link">Policies</a>
+                <a href="#" id="policy-link" class="text-white">Policies</a>
             </div>
         </footer>
 
     </div>
-    <!-- Base JS -->
+
     <script src="{{ url_for('static', filename='js/policy.js') }}"></script>
     <script src="{{ url_for('static', filename='js/cookies.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Page-specific scripts -->
     {% block scripts %}{% endblock %}
+
 </body>
 </html>

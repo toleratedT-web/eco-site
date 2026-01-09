@@ -2,60 +2,121 @@
 {% block title %}Green Products{% endblock %}
 
 {% block content %}
-<h1>Green Products</h1>
+<div class="container py-4 text-center">
 
-<ul class="category-tabs">
-    <li onclick="showContent('solar')">Solar Panels</li>
-    <li onclick="showContent('ev')">EV Chargers</li>
-    <li onclick="showContent('appliances')">Smart Home Appliances</li>
-</ul>
+    <!-- Centered Page Heading -->
+    <h1 class="mb-4 page-title">Green Products</h1>
 
-<!-- Solar Products -->
-<div id="solar" class="content_dis product-grid">
-    {% for product in solar_products %}
-    <div class="product-card">
-        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}">
-        <h3>{{ product.name }}</h3>
-        <p>{{ product.description }}</p>
-        <p class="price">£{{ product.price }}</p>
-        <button class="btn-add">Add to Basket</button>
+    <!-- Category Tabs -->
+    <ul class="category-tabs d-inline-flex p-0 mb-4">
+        <li class="tab-btn active" onclick="showContent('solar')">Solar Panels</li>
+        <li class="tab-btn" onclick="showContent('ev')">EV Chargers</li>
+        <li class="tab-btn" onclick="showContent('appliances')">Smart Home Appliances</li>
+    </ul>
+
+    <!-- Product Grids -->
+    <!-- Solar Products -->
+    <div id="solar" class="content_dis row g-4 justify-content-center">
+        {% for product in solar_products %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card h-100 shadow-sm border-light rounded">
+                {% if product.image_filename %}
+                <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" 
+                     class="card-img-top" style="height:180px; object-fit:cover;">
+                {% else %}
+                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:180px;">
+                    No Image
+                </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted small">{{ product.description }}</p>
+                    <p class="fw-bold mt-auto mb-3">£{{ product.price }}</p>
+                    <form method="post" action="{{ url_for('main.add_to_basket', product_id=product.id) }}">
+                        <button type="submit" class="btn btn-success w-100">Add to Basket</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
 
-<!-- EV Products -->
-<div id="ev" class="content_dis product-grid">
-    {% for product in ev_products %}
-    <div class="product-card">
-        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}">
-        <h3>{{ product.name }}</h3>
-        <p>{{ product.description }}</p>
-        <p class="price">£{{ product.price }}</p>
-        <button class="btn-add">Add to Basket</button>
+    <!-- EV Products -->
+    <div id="ev" class="content_dis row g-4 justify-content-center">
+        {% for product in ev_products %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card h-100 shadow-sm border-light rounded">
+                {% if product.image_filename %}
+                <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" 
+                     class="card-img-top" style="height:180px; object-fit:cover;">
+                {% else %}
+                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:180px;">
+                    No Image
+                </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted small">{{ product.description }}</p>
+                    <p class="fw-bold mt-auto mb-3">£{{ product.price }}</p>
+                    <form method="post" action="{{ url_for('main.add_to_basket', product_id=product.id) }}">
+                        <button type="submit" class="btn btn-success w-100">Add to Basket</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
 
-<!-- Appliances Products -->
-<div id="appliances" class="content_dis product-grid">
-    {% for product in appliance_products %}
-    <div class="product-card">
-        <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" alt="{{ product.name }}">
-        <h3>{{ product.name }}</h3>
-        <p>{{ product.description }}</p>
-        <p class="price">£{{ product.price }}</p>
-        <button class="btn-add">Add to Basket</button>
+    <!-- Appliances Products -->
+    <div id="appliances" class="content_dis row g-4 justify-content-center">
+        {% for product in appliance_products %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card h-100 shadow-sm border-light rounded">
+                {% if product.image_filename %}
+                <img src="{{ url_for('static', filename='images/' + product.image_filename) }}" 
+                     class="card-img-top" style="height:180px; object-fit:cover;">
+                {% else %}
+                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:180px;">
+                    No Image
+                </div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted small">{{ product.description }}</p>
+                    <p class="fw-bold mt-auto mb-3">£{{ product.price }}</p>
+                    <form method="post" action="{{ url_for('main.add_to_basket', product_id=product.id) }}">
+                        <button type="submit" class="btn btn-success w-100">Add to Basket</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
+
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script>
 window.showContent = function(id) {
+    // Hide all categories
     document.querySelectorAll('.content_dis').forEach(div => div.style.display = 'none');
+
+    // Remove active class from tabs
+    document.querySelectorAll('.tab-btn').forEach(tab => tab.classList.remove('active'));
+
+    // Show selected category
     const selected = document.getElementById(id);
-    if (selected) selected.style.display = 'grid'; // use grid for layout
+    if(selected) selected.style.display = 'flex';
+
+    // Highlight active tab
+    const tab = document.querySelector(`.tab-btn[onclick*="${id}"]`);
+    if(tab) tab.classList.add('active');
 }
+
+// Show default category on page load
+document.addEventListener("DOMContentLoaded", function() {
+    window.showContent('solar');
+});
 </script>
 {% endblock %}

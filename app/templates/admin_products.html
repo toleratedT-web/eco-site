@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Products{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Add Product Button -->
+    <button class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#productModal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Add Product
+    </button>
+
+    <!-- Product Grid -->
+    <div class="row g-3">
+        {% for product in products %}
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="card h-100 shadow-sm">
+                {% if product.image_filename %}
+                <img src="{{ url_for('static', filename='images/' ~ product.image_filename) }}" 
+                     class="card-img-top" style="object-fit: cover; height: 180px;">
+                {% else %}
+                <div class="card-img-top d-flex align-items-center justify-content-center bg-light" style="height:180px;">No Image</div>
+                {% endif %}
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text text-muted">{{ product.category | capitalize }}</p>
+                    <p class="fw-bold mb-3">£{{ product.price }}</p>
+                    <div class="mt-auto d-flex gap-2">
+                        <button class="btn btn-outline-primary btn-sm flex-grow-1 edit-btn" 
+                                data-bs-toggle="modal" 
+                                data-bs-target="#productModal"
+                                data-id="{{ product.id }}"
+                                data-name="{{ product.name }}"
+                                data-category="{{ product.category }}"
+                                data-price="{{ product.price }}">
+                            Edit
+                        </button>
+                        <form method="POST" action="{{ url_for('main.delete_product', product_id=product.id) }}" class="flex-grow-1">
+                            <button type="submit" class="btn btn-outline-danger btn-sm w-100">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Bootstrap Modal -->
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="productForm" method="POST" enctype="multipart/form-data" action="{{ url_for('main.add_product') }}">
+                {{ form.csrf_token }}
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalTitle">Add Product</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">{{ form.name.label(class="form-label") }} {{ form.name(class="form-control") }}</div>
+                    <div class="mb-3">{{ form.description.label(class="form-label") }} {{ form.description(class="form-control") }}</div>
+                    <div class="mb-3">{{ form.category.label(class="form-label") }} {{ form.category(class="form-control") }}</div>
+                    <div class="mb-3">{{ form.price.label(class="form-label") }} {{ form.price(class="form-control") }}</div>
+                    <div class="mb-3">{{ form.image.label(class="form-label") }} {{ form.image(class="form-control") }}</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary w-100">{{ form.submit() }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Populate modal for editing product
+const productModal = document.getElementById('productModal');
+const productForm = document.getElementById('productForm');
+const productModalTitle = document.getElementById('productModalTitle');
+
+document.querySelectorAll('.edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        const id = btn.dataset.id;
+        productModalTitle.textContent = "Edit Product";
+        productForm.action = `/admin/product/edit/${id}`;
+        productForm.name.value = btn.dataset.name;
+        productForm.category.value = btn.dataset.category;
+        productForm.price.value = btn.dataset.price;
+    });
+});
+
+// Reset modal for adding product
+productModal.addEventListener('show.bs.modal', event => {
+    const button = event.relatedTarget;
+    if (!button.classList.contains('edit-btn')) {
+        productModalTitle.textContent = "Add Product";
+        productForm.action = "{{ url_for('main.add_product') }}";
+        productForm.reset();
+    }
+});
+</script>
+{% endblock %}

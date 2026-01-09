@@ -1,3 +1,30 @@
+/* Profile Dropdown Custom Styles */
+.navbar .dropdown-toggle {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+.navbar .dropdown-menu {
+    min-width: 180px;
+    right: 0;
+    left: auto;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.navbar .dropdown-item {
+    color: #1b5e20;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.navbar .dropdown-item:hover {
+    background: #e8f5e9;
+    color: #1b5e20;
+}
+.navbar .rounded-circle {
+    object-fit: cover;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+/* ---------------- Hero Section ---------------- */
 .container-fluid-hero {
     position: relative;
     width: 100%;
@@ -8,25 +35,25 @@
     align-items: center;
     background-color: #e8f5e9; /* subtle eco-tint fallback */
 }
- 
+
 /* Hero Image */
 .container-fluid-hero .hero-element {
     width: 100%;
     height: 100%;
-    object-fit: cover;  /* Makes it crop elegantly */
+    object-fit: cover;  
     object-position: center;
-    filter: brightness(0.85); /* Slight darkening for depth */
-    border-radius: 0 0 18px 18px; /* Gentle lower curve */
+    filter: brightness(0.85); 
+    border-radius: 0 0 18px 18px;
     transition: transform 6s ease, filter 1s ease;
 }
- 
-/* Optional Slow Parallax-like Drift */
+
+/* Slow Hover Zoom */
 .container-fluid-hero:hover .hero-element {
     transform: scale(1.08);
     filter: brightness(0.92);
 }
- 
-/* Optional subtle shadow under hero */
+
+/* Subtle shadow under hero */
 .container-fluid-hero::after {
     content: "";
     position: absolute;
@@ -35,7 +62,17 @@
     height: 20px;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), transparent);
 }
- 
+
+.delete-btn {
+    width: 100%;
+    margin-top: 0;
+    padding: 0;
+    background-color: transparent;
+    border-radius: 0px;
+    box-shadow: 0 0 0 rgba(0, 0, 0, 0.1); 
+    overflow: hidden;
+}
+
 /* General Form Styling */
 form {
     width: 100%;
@@ -59,7 +96,6 @@ label {
     margin-bottom: 0.5rem;
 }
 
-/* Input Fields */
 .form-control {
     width: 100%;
     padding: 10px;
@@ -75,14 +111,13 @@ label {
     outline: none;
 }
 
-/* Invalid Feedback Styling */
+/* Validation Feedback */
 .invalid-feedback {
     color: #f44336;
     font-size: 0.875rem;
     margin-top: 5px;
 }
 
-/* Error states */
 input.is-invalid,
 textarea.is-invalid,
 select.is-invalid {
@@ -95,7 +130,7 @@ select.is-valid {
     border-color: #4CAF50;
 }
 
-/* Button Styling (if there is a submit button in the form) */
+/* Submit Buttons */
 button[type="submit"] {
     background-color: #4CAF50;
     color: white;
@@ -117,14 +152,15 @@ button[type="submit"]:disabled {
     cursor: not-allowed;
 }
 
-/* For hidden inputs, you may want to hide them visually but still have them in the DOM */
+/* Hidden Inputs */
 input[type="hidden"] {
     display: none;
 }
 
-/* Make footer stick to bottom of the page */
+/* ---------------- Layout & Footer ---------------- */
 html, body {
     height: 100%;
+    margin: 0;
 }
 
 .wrapper {
@@ -139,9 +175,14 @@ html, body {
 
 footer {
     flex-shrink: 0;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    padding: 1rem 0;
+    font-size: 0.9rem;
 }
 
-/* Feature placeholder boxes under hero */
+/* ---------------- Feature Cards ---------------- */
 .feature-card {
     background: #ffffff;
     border-radius: 8px;
@@ -149,7 +190,6 @@ footer {
     box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     margin-bottom: 1rem;
 }
-
 
 .content_dis {
     display: none;  /* hide all content initially */
@@ -160,35 +200,16 @@ li {
     margin: 5px 0;
 }
 
-/* Category tabs */
-.category-tabs {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-    padding: 0;
-    margin-bottom: 20px;
-}
-.category-tabs li {
-    cursor: pointer;
-    padding: 10px 20px;
-    background-color: #e0f2f1;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-.category-tabs li:hover {
-    background-color: #b2dfdb;
-}
 
-/* Product grid container */
+/* ---------------- Product Grid ---------------- */
 .product-grid {
-    display: none; /* hide initially */
+    display: grid; /* grid for layout */
     gap: 20px;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    display: grid; /* when visible */
     margin-top: 20px;
 }
 
-/* Individual product card */
+/* Product Card */
 .product-card {
     background-color: #f9f9f9;
     border: 1px solid #ddd;
@@ -198,26 +219,27 @@ li {
     box-shadow: 0 3px 6px rgba(0,0,0,0.1);
     transition: transform 0.2s, box-shadow 0.2s;
 }
+
 .product-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 6px 12px rgba(0,0,0,0.15);
 }
 
-/* Product image */
+/* Product Image */
 .product-card img {
     max-width: 100%;
     border-radius: 8px;
     margin-bottom: 10px;
 }
 
-/* Price styling */
+/* Price */
 .price {
     font-weight: bold;
     color: #388e3c;
     margin: 10px 0;
 }
 
-/* Add to Basket button */
+/* Add to Basket Button */
 .btn-add {
     background-color: #43a047;
     color: white;
@@ -227,6 +249,269 @@ li {
     cursor: pointer;
     transition: background-color 0.3s;
 }
+
 .btn-add:hover {
     background-color: #2e7d32;
+}
+
+/* ---------------- Misc ---------------- */
+.content_dis {
+    display: none; /* hide all content initially */
+}
+
+li {
+    cursor: pointer;
+    margin: 5px 0;
+}
+
+/* ---------------- Basket Icon ---------------- */
+.navbar .basket-icon,
+.basket-icon {
+    width: 70px;
+    height: auto;
+    object-fit: contain;
+}
+
+.basket-container {
+    display: flex;
+    gap: 30px;
+}
+
+.basket-items {
+    flex: 3;
+}
+
+.basket-item {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    padding: 20px 0;
+    gap: 20px;
+}
+
+.basket-image img {
+    width: 140px;
+}
+
+.basket-details {
+    flex: 2;
+}
+
+.basket-details h3 {
+    margin: 0 0 5px;
+}
+
+.in-stock {
+    color: green;
+    font-size: 0.9rem;
+}
+
+.basket-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.link-button {
+    background: none;
+    border: none;
+    color: #007185;
+    cursor: pointer;
+}
+
+.link-button:hover {
+    text-decoration: underline;
+}
+
+.basket-price {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.basket-summary {
+    flex: 1;
+    border: 1px solid #ddd;
+    padding: 20px;
+    height: fit-content;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 10px;
+    background: #ffd814;
+    border: 1px solid #fcd200;
+    cursor: pointer;
+}
+
+/* ---------------- Product Modal ---------------- */
+#productModal_container {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: rgba(0,0,0,0.5);
+}
+
+.productModal_content {
+    background: #f4f4f4;
+    margin: 10% auto;
+    padding: 20px;
+    width: 50%;
+    border-radius: 8px;
+    position: relative;
+}
+
+.productModal_closeBtn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+/* Form inside modal only */
+#productModal_form {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+}
+
+#productModal_form p {
+    margin-bottom: 1rem;
+}
+
+#productModal_form label {
+    font-weight: bold;
+    color: #333;
+}
+
+#productModal_form input,
+#productModal_form select,
+#productModal_form textarea {
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+#productModal_form button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+#productModal_form button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Centered Page Title */
+.page-title {
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+/* ---------------- Category Tabs ---------------- */
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #ccc; /* bottom line separator */
+    width: 100%;
+}
+
+.category-tabs .tab-btn {
+    position: relative;
+    padding: 10px 20px;
+    margin: 0;
+    cursor: pointer;
+    font-weight: 500;
+    color: #000; /* black text */
+    background-color: transparent !important; /* override bootstrap */
+    border: none; /* remove Bootstrap borders */
+}
+
+.category-tabs .tab-btn:hover {
+    color: #000; /* stays black on hover */
+    background-color: transparent !important;
+}
+
+.category-tabs .tab-btn.active {
+    font-weight: 700;
+    color: #000 !important;
+    background-color: transparent !important; /* ensures no bg color */
+}
+
+/* underline effect for active tab */
+.category-tabs .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #388e3c; /* green underline */
+}
+
+/* ---------------- Settings Sidebar (Edge-like) ---------------- */
+.settings-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+.settings-sidebar {
+    width: 260px;
+    background: #f7f7f8;
+    border-right: 1px solid rgba(0,0,0,0.06);
+    border-radius: 8px;
+    padding: 12px;
+    height: fit-content;
+}
+.settings-sidebar ul {
+    list-style: none;
+    padding: 8px;
+    margin: 0;
+}
+.settings-sidebar li {
+    margin: 6px 0;
+}
+.settings-sidebar a {
+    display: block;
+    padding: 10px 12px;
+    color: #111;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+}
+.settings-sidebar a:hover {
+    background: rgba(0,0,0,0.03);
+}
+.settings-sidebar a.active {
+    background: #e9f5ee;
+    color: #0b3d0b;
+}
+.settings-content {
+    flex: 1 1 auto;
+}
+.settings-section { margin-bottom: 18px; }
+.settings-section .card { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+@media (max-width: 900px) {
+    .settings-layout { flex-direction: column; }
+    .settings-sidebar { width: 100%; display: flex; overflow-x: auto; }
+    .settings-sidebar a { white-space: nowrap; }
 }
