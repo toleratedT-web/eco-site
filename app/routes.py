@@ -108,6 +108,66 @@ def add_to_basket(product_id):
 
     flash('Product added to basket!')
     return redirect(url_for('main.green_products'))
+
+
+@bp.route('/checkout', methods=['GET', 'POST'])
+@login_required
+def checkout():
+    # Build basket data from persistent basket or session like the basket view
+    basket = db.session.scalar(
+        sa.select(Basket).where(Basket.user_id == current_user.id)
+    )
+
+    items = []
+    total = 0.0
+
+    if not basket:
+        sess_basket = session.get('basket', {})
+        for pid, info in (sess_basket or {}).items():
+            qty = int(info.get('quantity', 1))
+            price = float(info.get('price', 0.0))
+            line_total = price * qty
+            total += line_total
+            items.append({
+                'id': int(pid),
+                'name': info.get('name'),
+                'quantity': qty,
+                'price': price,
+                'line_total': line_total,
+                'image': info.get('image')
+            })
+    else:
+        for it in basket.items:
+            prod = it.product
+            quantity = it.quantity or 1
+            unit_price = float(prod.price)
+            line_total = unit_price * quantity
+            total += line_total
+            items.append({
+                'id': prod.id,
+                'name': prod.name,
+                'quantity': quantity,
+                'price': unit_price,
+                'line_total': line_total,
+                'image': prod.image_filename
+            })
+
+    # default shipping cost can be overridden elsewhere
+    shipping_cost = 3.99
+
+    # If posting the checkout form, perform a simple placeholder action
+    if request.method == 'POST':
+        # In a full app this would create an Order, charge payment, etc.
+        # For now clear session basket and flash success
+        session.pop('basket', None)
+        flash('Order placed — thank you!', 'success')
+        return redirect(url_for('main.home'))
+
+    return render_template(
+        'checkout.html',
+        basket={'items': items, 'total_price': total},
+        shipping_cost=shipping_cost
+    )
 # Load user for Flask-Login
 @login.user_loader
 def load_user(id):
