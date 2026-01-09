@@ -77,22 +77,24 @@
           {% if bookings %}
             <div class="list-group">
               {% for b in bookings %}
-                <div class="list-group-item d-flex justify-content-between align-items-start">
-                  <div class="me-3">
-                    <div class="fw-semibold">{{ b.name }}</div>
-                    <div class="text-muted small">{{ b.appointment_datetime.strftime('%Y-%m-%d %H:%M') }}</div>
-                    {% if b.notes %}<div class="mt-2">{{ b.notes }}</div>{% endif %}
-                    {% if current_user.is_admin and b.user_id %}
-                      <div class="text-secondary small mt-1">User ID: {{ b.user_id }}</div>
-                    {% endif %}
+                {% if current_user.is_admin or b.user_id == current_user.id %}
+                  <div class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="me-3">
+                      <div class="fw-semibold">{{ b.name }}</div>
+                      <div class="text-muted small">{{ b.appointment_datetime.strftime('%Y-%m-%d %H:%M') }}</div>
+                      {% if b.notes %}<div class="mt-2">{{ b.notes }}</div>{% endif %}
+                      {% if current_user.is_admin and b.user_id %}
+                        <div class="text-secondary small mt-1">User ID: {{ b.user_id }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="btn-group btn-group-sm" role="group" aria-label="booking-actions">
+                      <a class="btn btn-outline-primary" href="{{ url_for('main.reschedule_booking', booking_id=b.id) }}">Reschedule</a>
+                      <form action="{{ url_for('main.cancel_booking', booking_id=b.id) }}" method="post" class="d-inline">
+                        <button class="btn btn-danger" type="submit">Cancel</button>
+                      </form>
+                    </div>
                   </div>
-                  <div class="btn-group btn-group-sm" role="group" aria-label="booking-actions">
-                    <a class="btn btn-outline-primary" href="{{ url_for('main.reschedule_booking', booking_id=b.id) }}">Reschedule</a>
-                    <form action="{{ url_for('main.cancel_booking', booking_id=b.id) }}" method="post" class="d-inline">
-                      <button class="btn btn-danger" type="submit">Cancel</button>
-                    </form>
-                  </div>
-                </div>
+                {% endif %}
               {% endfor %}
             </div>
           {% else %}
@@ -129,15 +131,21 @@ document.addEventListener('DOMContentLoaded', function(){
   function setActive(el){
     links.forEach(l=>l.classList.remove('active'));
     el.classList.add('active');
+    // show corresponding section
+    const id = el.getAttribute('href');
+    document.querySelectorAll('.settings-section').forEach(s=>s.classList.remove('active'));
+    const targetSection = document.querySelector(id);
+    if(targetSection) targetSection.classList.add('active');
+    // update hash without scrolling
+    history.replaceState(null, '', id);
   }
   links.forEach(link=>{
-    link.addEventListener('click', function(e){ setActive(e.currentTarget); });
+    link.addEventListener('click', function(e){ e.preventDefault(); setActive(e.currentTarget); });
   });
-  // set active based on hash
-  if(location.hash){
-    const target = document.querySelector('.settings-sidebar a[href="'+location.hash+'"]');
-    if(target) setActive(target);
-  }
+  // set active based on hash or default to profile
+  let initial = document.querySelector('.settings-sidebar a[href="'+location.hash+'"]');
+  if(!initial) initial = document.querySelector('.settings-sidebar a[href="#profile"]');
+  if(initial) setActive(initial);
 });
 </script>
 
