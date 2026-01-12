@@ -200,26 +200,6 @@ li {
     margin: 5px 0;
 }
 
-/* Category tabs */
-.category-tabs {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-    padding: 0;
-    margin-bottom: 20px;
-}
-
-.category-tabs li {
-    cursor: pointer;
-    padding: 10px 20px;
-    background-color: #e0f2f1;
-    border-radius: 5px;
-    transition: background-color 0.3s;
-}
-
-.category-tabs li:hover {
-    background-color: #b2dfdb;
-}
 
 /* ---------------- Product Grid ---------------- */
 .product-grid {
@@ -360,4 +340,231 @@ li {
     background: #ffd814;
     border: 1px solid #fcd200;
     cursor: pointer;
+}
+
+/* ---------------- Product Modal ---------------- */
+#productModal_container {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background: rgba(0,0,0,0.5);
+}
+
+.productModal_content {
+    background: #f4f4f4;
+    margin: 10% auto;
+    padding: 20px;
+    width: 50%;
+    border-radius: 8px;
+    position: relative;
+}
+
+.productModal_closeBtn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 28px;
+    cursor: pointer;
+}
+
+/* Form inside modal only */
+#productModal_form {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    background: none;
+    box-shadow: none;
+}
+
+#productModal_form p {
+    margin-bottom: 1rem;
+}
+
+#productModal_form label {
+    font-weight: bold;
+    color: #333;
+}
+
+#productModal_form input,
+#productModal_form select,
+#productModal_form textarea {
+    width: 100%;
+    padding: 8px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+#productModal_form button[type="submit"] {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 1rem;
+}
+
+#productModal_form button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+/* Centered Page Title */
+.page-title {
+    text-align: center;
+    font-weight: 700;
+    margin-bottom: 2rem;
+}
+
+/* ---------------- Category Tabs ---------------- */
+.category-tabs {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #ccc; /* bottom line separator */
+    width: 100%;
+}
+
+.category-tabs .tab-btn {
+    position: relative;
+    padding: 10px 20px;
+    margin: 0;
+    cursor: pointer;
+    font-weight: 500;
+    color: #000; /* black text */
+    background-color: transparent !important; /* override bootstrap */
+    border: none; /* remove Bootstrap borders */
+}
+
+.category-tabs .tab-btn:hover {
+    color: #000; /* stays black on hover */
+    background-color: transparent !important;
+}
+
+.category-tabs .tab-btn.active {
+    font-weight: 700;
+    color: #000 !important;
+    background-color: transparent !important; /* ensures no bg color */
+}
+
+/* underline effect for active tab */
+.category-tabs .tab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: #388e3c; /* green underline */
+}
+
+/* ---------------- Settings Sidebar (Edge-like) ---------------- */
+.settings-layout {
+    display: block; /* content flow managed by fixed sidebar */
+}
+.settings-sidebar {
+    width: 260px;
+    position: fixed;
+    top: calc(var(--navbar-height, 56px) + 12px); /* below navbar; uses CSS var if available */
+    left: 20px;
+    bottom: 20px;
+    background: #f5f6f7; /* soft neutral gray */
+    border-radius: 10px;
+    padding: 12px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    border: 1px solid rgba(0,0,0,0.06);
+    z-index: 10; /* keep sidebar above content to avoid visual overlap */
+}
+.settings-sidebar ul {
+    list-style: none;
+    padding: 8px;
+    margin: 0;
+}
+.settings-sidebar li { margin: 6px 0; }
+.settings-sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+    color: #111;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+.settings-sidebar a:hover { background: rgba(0,0,0,0.04); transform: translateX(2px); }
+.settings-sidebar a.active { background: #e9f5ff; color: #0b3d6b; }
+
+.settings-content {
+    margin-left: 320px; /* leave space for fixed sidebar */
+    padding: 20px 28px 40px 28px;
+    padding-top: calc(var(--navbar-height, 56px) + 20px); /* ensure content sits below navbar */
+}
+
+/* Sections: hide non-active with smooth fade */
+.settings-section { display: none; opacity: 0; transform: translateY(6px); transition: opacity 240ms ease, transform 240ms ease; margin-bottom: 18px; }
+.settings-section.active { display: block; opacity: 1; transform: none; }
+.settings-section .card { border: 1px solid rgba(0,0,0,0.04); }
+
+/* Input spacing for airy layout */
+.settings-section .form-control,
+.settings-section select,
+.settings-section .form-check-input {
+    padding: 12px 14px;
+    border-radius: 8px;
+    border: 1px solid rgba(0,0,0,0.08);
+    background: #fff;
+}
+
+/* Minimal toggle switch */
+.form-switch .form-check-input {
+    width: 44px;
+    height: 24px;
+    margin-left: 0;
+}
+.form-switch .form-check-input:checked {
+    background-color: #4da6ff;
+    border-color: #4da6ff;
+}
+
+/* Responsive: collapse sidebar to top nav on small screens */
+@media (max-width: 900px) {
+    .settings-sidebar { position: static; width: 100%; height: auto; bottom: auto; left: auto; top: auto; border-radius: 8px; margin-bottom: 12px; }
+    .settings-content { margin-left: 0; padding: 12px; }
+    .settings-sidebar a { white-space: nowrap; }
+}
+
+/* ---------------- Checkout Layout ---------------- */
+.checkout-wrapper { display: flex; gap: 28px; align-items: stretch; justify-content: center; padding: 24px; }
+.checkout-card { background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 10px; padding: 20px; box-sizing: border-box; }
+.order-summary, .customer-info { flex: 1 1 480px; }
+.order-summary { max-width: 520px; }
+.customer-info { max-width: 520px; }
+.checkout-columns { display: flex; gap: 24px; align-items: stretch; }
+.cart-item { display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.04); align-items: center; }
+.cart-item .item-meta { flex: 1 1 auto; }
+.cart-item .item-price { font-weight: 600; min-width: 80px; text-align: right; }
+.summary-totals { margin-top: 12px; border-top: 1px solid rgba(0,0,0,0.04); padding-top: 12px; }
+.summary-totals .total { font-size: 1.25rem; font-weight: 700; }
+.proceed-btn { display: block; width: 100%; padding: 12px; border-radius: 8px; background: #cfeffd; color: #064a72; border: 1px solid rgba(6,74,114,0.08); }
+
+/* Customer form */
+.customer-info label { display: block; margin-bottom: 6px; font-weight: 600; }
+.customer-info input, .customer-info select { width: 100%; padding: 10px 12px; border-radius: 8px; border: 1px solid rgba(0,0,0,0.08); margin-bottom: 12px; }
+.place-order-btn { width: 100%; padding: 12px; border-radius: 8px; background: #7ad39a; color: #063b18; border: none; font-weight: 700; }
+
+@media (max-width: 1000px) {
+    .checkout-columns { flex-direction: column; }
+    .order-summary, .customer-info { max-width: 100%; }
 }

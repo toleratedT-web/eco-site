@@ -30,8 +30,32 @@ def basket():
         sa.select(Basket).where(Basket.user_id == current_user.id)
     )
 
+    # If there's no persistent basket for the user, fall back to session-based basket
     if not basket:
-        return render_template('basket.html', basket={'items': [], 'total_price': '£0.00'})
+        sess_basket = session.get('basket')
+        if sess_basket:
+            items = []
+            total = 0.0
+            for pid, info in sess_basket.items():
+                qty = int(info.get('quantity', 1))
+                price = float(info.get('price', 0.0))
+                line_total = price * qty
+                total += line_total
+                items.append({
+                    'id': int(pid),
+                    'name': info.get('name'),
+                    'quantity': qty,
+                    'price': price,
+                    'line_total': line_total,
+                    'image': info.get('image')
+                })
+
+            return render_template('basket.html', basket={
+                'items': items,
+                'total_price': total
+            })
+
+        return render_template('basket.html', basket={'items': [], 'total_price': 0.0})
 
     total = 0.0
     items = []
@@ -85,6 +109,65 @@ def add_to_basket(product_id):
     flash('Product added to basket!')
     return redirect(url_for('main.green_products'))
 
+
+@bp.route('/checkout', methods=['GET', 'POST'])
+@login_required
+def checkout():
+    # Build basket data from persistent basket or session like the basket view
+    basket = db.session.scalar(
+        sa.select(Basket).where(Basket.user_id == current_user.id)
+    )
+
+    items = []
+    total = 0.0
+
+    if not basket:
+        sess_basket = session.get('basket', {})
+        for pid, info in (sess_basket or {}).items():
+            qty = int(info.get('quantity', 1))
+            price = float(info.get('price', 0.0))
+            line_total = price * qty
+            total += line_total
+            items.append({
+                'id': int(pid),
+                'name': info.get('name'),
+                'quantity': qty,
+                'price': price,
+                'line_total': line_total,
+                'image': info.get('image')
+            })
+    else:
+        for it in basket.items:
+            prod = it.product
+            quantity = it.quantity or 1
+            unit_price = float(prod.price)
+            line_total = unit_price * quantity
+            total += line_total
+            items.append({
+                'id': prod.id,
+                'name': prod.name,
+                'quantity': quantity,
+                'price': unit_price,
+                'line_total': line_total,
+                'image': prod.image_filename
+            })
+
+    # default shipping cost can be overridden elsewhere
+    shipping_cost = 3.99
+
+    # If posting the checkout form, perform a simple placeholder action
+    if request.method == 'POST':
+        # In a full app this would create an Order, charge payment, etc.
+        # For now clear session basket and flash success
+        session.pop('basket', None)
+        flash('Order placed — thank you!', 'success')
+        return redirect(url_for('main.home'))
+
+    return render_template(
+        'checkout.html',
+        basket={'items': items, 'total_price': total},
+        shipping_cost=shipping_cost
+    )
 # Load user for Flask-Login
 @login.user_loader
 def load_user(id):
@@ -223,10 +306,14 @@ def settings():
         flash('Support message sent. Our team will contact you shortly.')
         return redirect(url_for('main.settings'))
 
-    # User bookings to manage
-    user_bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.appointment_datetime.desc()).all()
-    user_entries = EnergyEntry.query.filter_by(user_id=current_user.id).order_by(EnergyEntry.entry_date.desc()).all()
-    return render_template('settings.html', settings_form=settings_form, pwd_form=pwd_form, support_form=support_form, bookings=user_bookings, entries=user_entries)
+    # Bookings to manage: admins see all bookings, users see only their own
+    if current_user.is_admin:
+        user_bookings = Booking.query.order_by(Booking.appointment_datetime.desc()).all()
+    else:
+        user_bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.appointment_datetime.desc()).all()
+
+    return render_template('settings.html', settings_form=settings_form, pwd_form=pwd_form, support_form=support_form, bookings=user_bookings)
+
 
 @bp.route('/booking/cancel/<int:booking_id>', methods=['POST'])
 @login_required
@@ -373,8 +460,12 @@ def carbon_calculator():
 
 
 @bp.route("/delete/<id>", methods=["POST"])
+@login_required
 def delete(id):
     footprint = Footprint.query.get_or_404(id)
+    # Only allow admins to delete footprint records
+    if not current_user.is_admin:
+        abort(403)
     db.session.delete(footprint)
     db.session.commit()
     return redirect(url_for('main.footprint_dashboard'))
@@ -500,13 +591,17 @@ def admin_manage_users():
     return render_template('admin_manage_users.html', users=users)
 
 # Admin: List all products
+from app.forms import ProductForm
+
 @bp.route('/admin/products')
 @login_required
 def admin_products():
     if not current_user.is_admin:
         abort(403)
+
     products = Product.query.all()
-    return render_template('admin_products.html', products=products)
+    form = ProductForm()  # <-- add this line
+    return render_template('admin_products.html', products=products, form=form)
 
 # Admin: Add product
 @bp.route('/admin/product/add', methods=['GET', 'POST'])
