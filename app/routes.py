@@ -276,43 +276,61 @@ def energy_tracker():
 @bp.route('/settings', methods=['GET', 'POST'])
 @login_required
 def settings():
+    # ===== Forms =====
     settings_form = SettingsForm(obj=current_user)
     pwd_form = ChangePasswordForm()
     support_form = SupportForm()
 
-    # Update basic settings
-    if settings_form.validate_on_submit():
+    # ===== Update Profile (name/email) =====
+    if settings_form.validate_on_submit() and 'save_settings' in (s.name for s in settings_form):
         current_user.name = settings_form.name.data
         current_user.email = settings_form.email.data
         db.session.commit()
-        flash('Settings updated.')
+        flash('Settings updated successfully.')
         return redirect(url_for('main.settings'))
 
-    # Change password
-    if pwd_form.validate_on_submit():
+    # ===== Change Password =====
+    if pwd_form.validate_on_submit() and 'submit' in (s.name for s in pwd_form):
         if not current_user.check_password(pwd_form.current_password.data):
-            flash('Current password incorrect.', 'danger')
+            flash('Current password is incorrect.', 'danger')
         else:
             current_user.set_password(pwd_form.password.data)
             db.session.commit()
             flash('Password changed successfully.')
         return redirect(url_for('main.settings'))
-    
-    # Send support message
+
+    # ===== Support Message =====
     if support_form.validate_on_submit():
-        msg = SupportMessage(user_id=current_user.id, subject=support_form.subject.data, message=support_form.message.data)
+        msg = SupportMessage(
+            user_id=current_user.id,
+            subject=support_form.subject.data,
+            message=support_form.message.data
+        )
         db.session.add(msg)
         db.session.commit()
         flash('Support message sent. Our team will contact you shortly.')
         return redirect(url_for('main.settings'))
 
-    # Bookings to manage: admins see all bookings, users see only their own
+    # ===== Bookings =====
     if current_user.is_admin:
         user_bookings = Booking.query.order_by(Booking.appointment_datetime.desc()).all()
     else:
         user_bookings = Booking.query.filter_by(user_id=current_user.id).order_by(Booking.appointment_datetime.desc()).all()
 
-    return render_template('settings.html', settings_form=settings_form, pwd_form=pwd_form, support_form=support_form, bookings=user_bookings)
+    # ===== Energy Tracker =====
+    energy_entries = EnergyEntry.query.filter_by(user_id=current_user.id).order_by(EnergyEntry.entry_date).all()
+    energy_dates = [entry.entry_date.strftime('%Y-%m-%d') for entry in energy_entries]
+    energy_kwh = [entry.kwh for entry in energy_entries]
+
+    return render_template(
+        'settings.html',
+        settings_form=settings_form,
+        pwd_form=pwd_form,
+        support_form=support_form,
+        bookings=user_bookings,
+        energy_dates=energy_dates,
+        energy_kwh=energy_kwh
+    )
 
 
 @bp.route('/booking/cancel/<int:booking_id>', methods=['POST'])
@@ -700,3 +718,32 @@ def remove_from_basket(product_id):
     session['basket'] = basket
     session.modified = True
     return redirect(url_for('main.basket'))
+
+@bp.route('/settings/update-profile', methods=['POST'])
+@login_required
+def update_profile():
+    form = SettingsForm()
+    if form.validate_on_submit():
+        current_user.username = form.name.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Profile updated successfully.', 'success')
+    return redirect(url_for('main.settings'))
+
+@bp.route('/settings/change-password', methods=['POST'])
+@login_required
+def change_password():
+    form = ChangePasswordForm()
+    if form.validate_on_submit():
+        # Check current password
+        if not current_user.check_password(form.current_password.data):
+            flash('Current password is incorrect.', 'danger')
+            return redirect(url_for('main.settings'))
+
+        # Set new password
+        current_user.set_password(form.password.data)
+        db.session.commit()
+        flash('Password updated successfully.', 'success')
+
+    return redirect(url_for('main.settings'))
+
