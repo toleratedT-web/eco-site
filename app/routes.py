@@ -1,11 +1,11 @@
 from flask import Blueprint, jsonify, render_template, flash, redirect, url_for, request, session, abort
 from urllib.parse import urlsplit
 from app import db, login
-from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm, SettingsForm, ChangePasswordForm, SupportForm, BookingRescheduleForm, EnergyEntryForm, EnergyGoalForm
+from app.forms import LoginForm, RegistrationForm, FootprintForm, BookingForm, SettingsForm, ChangePasswordForm, SupportForm, BookingRescheduleForm, EnergyEntryForm
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from sqlalchemy import func
-from app.models import User, Booking, Product, Footprint, Basket, BasketItem, SupportMessage, EnergyEntry, EnergyGoal
+from app.models import User, Booking, Product, Footprint, Basket, BasketItem, SupportMessage, EnergyEntry
 import datetime
 from datetime import date
 from app.forms import ResetPasswordRequestForm
@@ -22,7 +22,6 @@ from flask import render_template, redirect, url_for, flash, request
 from flask_login import current_user, login_required
 from app.forms import SettingsForm, ChangePasswordForm, SupportForm
 from app import db
-
 
 # Blueprint for routes
 bp = Blueprint('main', __name__)
@@ -89,6 +88,7 @@ def basket():
             'total_price': total
         }
     )
+
 # add_to_basket
 @bp.route('/basket/add/<int:product_id>', methods=['POST'])
 @login_required
@@ -177,7 +177,6 @@ def checkout():
 def load_user(id):
     return User.query.get(int(id))
 
-
 @bp.route('/')
 def home():
     return render_template('home.html')
@@ -193,7 +192,6 @@ def green_products():
         ev_products=ev_products,
         appliance_products=appliance_products
     )
-
 
 @bp.route('/consultation', methods=['GET', 'POST'])
 def consultation():
@@ -259,40 +257,17 @@ def consultation():
 @login_required
 def energy_tracker():
     entry_form = EnergyEntryForm()
-    goal_form = EnergyGoalForm()
 
     # Add new energy entry
-    if entry_form.validate_on_submit() and entry_form.submit.data:
+    if entry_form.validate_on_submit():
         entry = EnergyEntry(user_id=current_user.id, entry_date=entry_form.entry_date.data, kwh=entry_form.kwh.data)
         db.session.add(entry)
         db.session.commit()
         flash('Energy entry added.')
         return redirect(url_for('main.energy_tracker'))
 
-    # Save/Update goal
-    if goal_form.validate_on_submit() and goal_form.submit.data:
-        goal = db.session.scalar(sa.select(EnergyGoal).where(EnergyGoal.user_id == current_user.id))
-        if not goal:
-            goal = EnergyGoal(user_id=current_user.id, daily_kwh_goal=goal_form.daily_kwh_goal.data)
-            db.session.add(goal)
-        else:
-            goal.daily_kwh_goal = goal_form.daily_kwh_goal.data
-        db.session.commit()
-        flash('Daily energy goal saved.')
-        return redirect(url_for('main.energy_tracker'))
-
     # Load user's entries and goal
     entries = db.session.scalars(sa.select(EnergyEntry).where(EnergyEntry.user_id == current_user.id).order_by(EnergyEntry.entry_date.desc())).all()
-    goal = db.session.scalar(sa.select(EnergyGoal).where(EnergyGoal.user_id == current_user.id))
-
-    # Simple tips based on latest entry
-    tips = []
-    latest = entries[0] if entries else None
-    if latest:
-        if latest.kwh > (goal.daily_kwh_goal or 0):
-            tips.append('Your latest day is above your goal — consider reducing appliance usage.')
-        else:
-            tips.append('You are within your goal — keep up the good work!')
 
     # Summarize weekly average (last 7 entries by date)
     recent = entries[:7]
@@ -300,8 +275,7 @@ def energy_tracker():
     if recent:
         avg = round(sum(e.kwh for e in recent) / len(recent), 2)
 
-    return render_template('energy_tracker.html', entry_form=entry_form, goal_form=goal_form, entries=entries, goal=goal, tips=tips, weekly_avg=avg)
-
+    return render_template('energy_tracker.html', entry_form=entry_form, entries=entries, weekly_avg=avg)
 
 @bp.route('/settings', methods=['GET', 'POST'])
 @login_required
@@ -374,6 +348,16 @@ def cancel_booking(booking_id):
     flash('Booking cancelled.')
     return redirect(url_for('main.settings'))
 
+@bp.route('/entry/delete/<int:entry_id>', methods=['POST'])
+@login_required
+def delete_entry(entry_id):
+    entry = EnergyEntry.query.get_or_404(entry_id)
+    if entry.user_id != current_user.id and not current_user.is_admin:
+        abort(403)
+    db.session.delete(entry)
+    db.session.commit()
+    flash('Energy Entry Deleted.')
+    return redirect(url_for('main.settings'))
 
 @bp.route('/booking/reschedule/<int:booking_id>', methods=['GET', 'POST'])
 @login_required
@@ -395,12 +379,10 @@ def reschedule_booking(booking_id):
         return redirect(url_for('main.settings'))
     return render_template('reschedule_booking.html', form=form, booking=booking)
 
-
 @bp.route('/dashboard')
 @login_required
 def dashboard():
     return render_template('dashboard.html', user=current_user)
-
 
 @bp.route('/login', methods=['GET', 'POST'])
 def login_route():
@@ -420,12 +402,10 @@ def login_route():
         return redirect(next_page)
     return render_template('login.html', title='Sign In', form=form)
 
-
 @bp.route('/logout')
 def logout_route():
     logout_user()
     return redirect(url_for('main.home'))
-
 
 @bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -441,7 +421,6 @@ def register():
         return redirect(url_for('main.login_route'))
     return render_template('register.html', title='Register', form=form)
 
-
 # Password reset request (user enters email)
 @bp.route('/reset_password_request', methods=['GET', 'POST'])
 def reset_password_request():
@@ -456,9 +435,8 @@ def reset_password_request():
         return redirect(url_for('main.login_route'))
     return render_template('reset_password_request.html', form=form)
 
-
 @bp.route("/footprint_dashboard")
-#@login_required - for logged users only
+@login_required
 def footprint_dashboard():
     footprints = Footprint.query.order_by(Footprint.id).all()
     return render_template("footprint_dashboard.html", footprints=footprints)
@@ -648,7 +626,6 @@ def admin_products():
     return render_template('admin_products.html', products=products, form=form)
 
 # Admin: Add product
-# Admin: Add product
 @bp.route('/admin/product/add', methods=['GET', 'POST'])
 @login_required
 def add_product():
@@ -681,7 +658,6 @@ def add_product():
         return redirect(url_for('main.admin_products'))
 
     return render_template('admin_product_form.html', form=form, action='Add')
-
 
 # Admin: Edit product
 @bp.route('/admin/product/edit/<int:product_id>', methods=['GET', 'POST'])
@@ -738,7 +714,6 @@ def update_basket(product_id):
     session['basket'] = basket
     session.modified = True
     return redirect(url_for('main.basket'))
-
 
 @bp.route('/basket/remove/<int:product_id>', methods=['POST'])
 def remove_from_basket(product_id):
