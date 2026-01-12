@@ -467,84 +467,187 @@ li {
     background-color: #388e3c; /* green underline */
 }
 
-/* ---------------- Settings Sidebar (Edge-like) ---------------- */
+/* ================================
+   Settings Layout (Google-style)
+   ================================ */
+
 .settings-layout {
-    display: block; /* content flow managed by fixed sidebar */
+    display: flex;
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
+
+/* ================================
+   Sidebar
+   ================================ */
+
 .settings-sidebar {
-    width: 260px;
-    position: fixed;
-    top: calc(var(--navbar-height, 56px) + 12px); /* below navbar; uses CSS var if available */
-    left: 20px;
-    bottom: 20px;
-    background: #f5f6f7; /* soft neutral gray */
-    border-radius: 10px;
-    padding: 12px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    border: 1px solid rgba(0,0,0,0.06);
-    z-index: 10; /* keep sidebar above content to avoid visual overlap */
+    width: 240px;
+    flex-shrink: 0;
 }
+
 .settings-sidebar ul {
     list-style: none;
-    padding: 8px;
+    padding: 0;
     margin: 0;
 }
-.settings-sidebar li { margin: 6px 0; }
-.settings-sidebar a {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 14px;
-    color: #111;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+
+.settings-sidebar li {
+    margin-bottom: 4px;
 }
-.settings-sidebar a:hover { background: rgba(0,0,0,0.04); transform: translateX(2px); }
-.settings-sidebar a.active { background: #e9f5ff; color: #0b3d6b; }
+
+.settings-sidebar a {
+    display: block;
+    padding: 10px 16px;
+    border-radius: 24px;
+    text-decoration: none;
+    color: #3c4043;
+    font-weight: 500;
+    transition: background-color 0.15s ease;
+}
+
+.settings-sidebar a:hover {
+    background-color: #f1f3f4;
+}
+
+.settings-sidebar a.active {
+    background-color: #e8f0fe;
+    color: #1a73e8;
+}
+
+/* ================================
+   Content Area
+   ================================ */
 
 .settings-content {
-    margin-left: 320px; /* leave space for fixed sidebar */
-    padding: 20px 28px 40px 28px;
-    padding-top: calc(var(--navbar-height, 56px) + 20px); /* ensure content sits below navbar */
+    flex: 1;
 }
 
-/* Sections: hide non-active with smooth fade */
-.settings-section { display: none; opacity: 0; transform: translateY(6px); transition: opacity 240ms ease, transform 240ms ease; margin-bottom: 18px; }
-.settings-section.active { display: block; opacity: 1; transform: none; }
-.settings-section .card { border: 1px solid rgba(0,0,0,0.04); }
+/* Only show active section */
+.settings-section {
+    display: none;
+}
 
-/* Input spacing for airy layout */
-.settings-section .form-control,
-.settings-section select,
-.settings-section .form-check-input {
-    padding: 12px 14px;
+.settings-section.active {
+    display: block;
+}
+
+/* ================================
+   Cards (Material-ish)
+   ================================ */
+
+.settings-section .card {
+    border: 1px solid #dadce0;
+    border-radius: 12px;
+    box-shadow: none;
+}
+
+.settings-section .card + .card {
+    margin-top: 24px;
+}
+
+.card-body {
+    padding: 24px;
+}
+
+.card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #202124;
+    margin-bottom: 16px;
+}
+
+/* ================================
+   Settings – Forms
+   ================================ */
+
+.settings-layout .form-label {
+    font-weight: 500;
+    color: #3c4043;
+}
+
+.settings-layout .form-control,
+.settings-layout .form-select {
     border-radius: 8px;
-    border: 1px solid rgba(0,0,0,0.08);
-    background: #fff;
+    border-color: #dadce0;
 }
 
-/* Minimal toggle switch */
-.form-switch .form-check-input {
-    width: 44px;
-    height: 24px;
-    margin-left: 0;
-}
-.form-switch .form-check-input:checked {
-    background-color: #4da6ff;
-    border-color: #4da6ff;
+.settings-layout .form-control:focus,
+.settings-layout .form-select:focus {
+    border-color: #1a73e8;
+    box-shadow: 0 0 0 1px rgba(26,115,232,.2);
 }
 
-/* Responsive: collapse sidebar to top nav on small screens */
-@media (max-width: 900px) {
-    .settings-sidebar { position: static; width: 100%; height: auto; bottom: auto; left: auto; top: auto; border-radius: 8px; margin-bottom: 12px; }
-    .settings-content { margin-left: 0; padding: 12px; }
-    .settings-sidebar a { white-space: nowrap; }
+/* ================================
+   Settings – Buttons
+   ================================ */
+
+.settings-layout .btn-primary {
+    background-color: #1a73e8;
+    border-color: #1a73e8;
 }
 
+.settings-layout .btn-primary:hover {
+    background-color: #1669c1;
+    border-color: #1669c1;
+}
+
+.settings-layout .btn-outline-secondary {
+    border-radius: 8px;
+}
+
+.settings-layout .btn-warning {
+    background-color: #fbbc04;
+    border-color: #fbbc04;
+    color: #202124;
+}
+
+.settings-layout .btn-warning:hover {
+    background-color: #e2aa00;
+}
+
+/* ================================
+   Settings – Lists (Bookings)
+   ================================ */
+
+.settings-layout .list-group-item {
+    border: 1px solid #dadce0;
+    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.settings-layout .list-group-item:last-child {
+    margin-bottom: 0;
+}
+
+/* ================================
+   Settings – Page Title
+   ================================ */
+
+.settings-layout h1 {
+    font-size: 1.6rem;
+    font-weight: 500;
+    color: #202124;
+}
+
+/* ================================
+   Settings – Responsive
+   ================================ */
+
+@media (max-width: 992px) {
+    .settings-layout {
+        flex-direction: column;
+    }
+
+    .settings-layout .settings-sidebar {
+        width: 100%;
+    }
+
+    .settings-layout .settings-sidebar a {
+        border-radius: 12px;
+    }
+}
 /* ---------------- Checkout Layout ---------------- */
 .checkout-wrapper { display: flex; gap: 28px; align-items: stretch; justify-content: center; padding: 24px; }
 .checkout-card { background: #fff; border: 1px solid rgba(0,0,0,0.06); border-radius: 10px; padding: 20px; box-sizing: border-box; }

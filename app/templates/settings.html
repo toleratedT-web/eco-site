@@ -3,10 +3,13 @@
 {% block title %}Settings{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Account Settings</h1>
 
 <div class="settings-layout">
+
+  
+
   <nav class="settings-sidebar" aria-label="Settings navigation">
+    <h1 class="mb-4">Account Settings</h1>
     <ul>
       <li><a href="#general" class="active">General</a></li>
       <li><a href="#appearance">Appearance</a></li>
@@ -17,6 +20,7 @@
   </nav>
 
   <div class="settings-content">
+
     <section id="profile" class="settings-section">
       <div class="card">
         <div class="card-body">
@@ -42,31 +46,67 @@
 
     <section id="general" class="settings-section">
       <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">General</h5>
-          <form>
-            <div class="mb-3">
-              <label class="form-label">Language</label>
-              <select class="form-select">
-                <option>English</option>
-                <option>Spanish</option>
-              </select>
-            </div>
+  <div class="card-body">
+    <h5 class="card-title">Your bookings & consultations</h5>
 
-            <div class="form-check form-switch mb-3">
-              <input class="form-check-input" type="checkbox" id="notificationsSwitch" checked>
-              <label class="form-check-label" for="notificationsSwitch">Enable notifications</label>
-            </div>
+    {% if bookings %}
+      <div class="list-group">
+        {% for b in bookings %}
+          {% if b.user_id == current_user.id %}
+            <div class="list-group-item d-flex justify-content-between align-items-start">
 
-            <div class="mb-3">
-              <label class="form-label">Display name</label>
-              <input class="form-control" placeholder="Display name">
-            </div>
+              <div class="me-3">
+                <div class="fw-semibold">
+                  {{ b.name }}
+                </div>
 
-            <button class="btn btn-primary">Save</button>
-          </form>
-        </div>
+                <div class="text-muted small">
+                  {{ b.appointment_datetime.strftime('%A %d %B %Y, %H:%M') }}
+                </div>
+
+                {% if b.type %}
+                  <div class="text-muted small">
+                    {{ b.type }}
+                  </div>
+                {% endif %}
+
+                {% if b.notes %}
+                  <div class="mt-2 small">
+                    {{ b.notes }}
+                  </div>
+                {% endif %}
+              </div>
+
+              <div class="btn-group btn-group-sm" role="group">
+                <a
+                  href="{{ url_for('main.reschedule_booking', booking_id=b.id) }}"
+                  class="btn btn-outline-primary"
+                >
+                  Edit time
+                </a>
+
+                <form
+                  action="{{ url_for('main.cancel_booking', booking_id=b.id) }}"
+                  method="post"
+                >
+                  <button class="btn btn-danger" type="submit">
+                    Cancel
+                  </button>
+                </form>
+              </div>
+
+            </div>
+          {% endif %}
+        {% endfor %}
       </div>
+    {% else %}
+      <p class="text-muted mb-0">
+        You have no upcoming bookings or consultations.
+      </p>
+    {% endif %}
+
+  </div>
+</div>
     </section>
 
     <section id="appearance" class="settings-section">
@@ -120,9 +160,18 @@
           <h5 class="card-title">Change Password</h5>
           <form method="post">
             {{ pwd_form.hidden_tag() }}
-            <div class="mb-2">{{ pwd_form.current_password.label(class='form-label') }}{{ pwd_form.current_password(class='form-control') }}</div>
-            <div class="mb-2">{{ pwd_form.password.label(class='form-label') }}{{ pwd_form.password(class='form-control') }}</div>
-            <div class="mb-3">{{ pwd_form.password2.label(class='form-label') }}{{ pwd_form.password2(class='form-control') }}</div>
+            <div class="mb-2">
+              {{ pwd_form.current_password.label(class='form-label') }}
+              {{ pwd_form.current_password(class='form-control') }}
+            </div>
+            <div class="mb-2">
+              {{ pwd_form.password.label(class='form-label') }}
+              {{ pwd_form.password(class='form-control') }}
+            </div>
+            <div class="mb-3">
+              {{ pwd_form.password2.label(class='form-label') }}
+              {{ pwd_form.password2(class='form-control') }}
+            </div>
             <button class="btn btn-warning" type="submit">Change Password</button>
           </form>
         </div>
@@ -135,8 +184,14 @@
           <h5 class="card-title">Contact Support</h5>
           <form method="post">
             {{ support_form.hidden_tag() }}
-            <div class="mb-2">{{ support_form.subject.label(class='form-label') }}{{ support_form.subject(class='form-control') }}</div>
-            <div class="mb-3">{{ support_form.message.label(class='form-label') }}{{ support_form.message(class='form-control') }}</div>
+            <div class="mb-2">
+              {{ support_form.subject.label(class='form-label') }}
+              {{ support_form.subject(class='form-control') }}
+            </div>
+            <div class="mb-3">
+              {{ support_form.message.label(class='form-label') }}
+              {{ support_form.message(class='form-control') }}
+            </div>
             <button class="btn btn-secondary" type="submit">Send</button>
           </form>
         </div>
@@ -160,9 +215,9 @@
                         <div class="text-secondary small mt-1">User ID: {{ b.user_id }}</div>
                       {% endif %}
                     </div>
-                    <div class="btn-group btn-group-sm" role="group" aria-label="booking-actions">
+                    <div class="btn-group btn-group-sm">
                       <a class="btn btn-outline-primary" href="{{ url_for('main.reschedule_booking', booking_id=b.id) }}">Reschedule</a>
-                      <form action="{{ url_for('main.cancel_booking', booking_id=b.id) }}" method="post" class="d-inline">
+                      <form action="{{ url_for('main.cancel_booking', booking_id=b.id) }}" method="post">
                         <button class="btn btn-danger" type="submit">Cancel</button>
                       </form>
                     </div>
@@ -177,15 +232,6 @@
       </div>
     </section>
 
-    <section id="account" class="settings-section">
-      <div class="card">
-        <div class="card-body">
-          <h5 class="card-title">Account</h5>
-          <p class="text-muted mb-0">Manage account-level settings and preferences.</p>
-        </div>
-      </div>
-    </section>
-
     <section id="security" class="settings-section">
       <div class="card">
         <div class="card-body">
@@ -194,31 +240,37 @@
         </div>
       </div>
     </section>
+
   </div>
 </div>
 
 <script>
-// Sidebar active link handling
-document.addEventListener('DOMContentLoaded', function(){
+document.addEventListener('DOMContentLoaded', function () {
   const links = document.querySelectorAll('.settings-sidebar a');
-  function setActive(el){
-    links.forEach(l=>l.classList.remove('active'));
+
+  function setActive(el) {
+    links.forEach(l => l.classList.remove('active'));
     el.classList.add('active');
-    // show corresponding section
+
     const id = el.getAttribute('href');
-    document.querySelectorAll('.settings-section').forEach(s=>s.classList.remove('active'));
-    const targetSection = document.querySelector(id);
-    if(targetSection) targetSection.classList.add('active');
-    // update hash without scrolling
+    document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+
+    const target = document.querySelector(id);
+    if (target) target.classList.add('active');
+
     history.replaceState(null, '', id);
   }
-  links.forEach(link=>{
-    link.addEventListener('click', function(e){ e.preventDefault(); setActive(e.currentTarget); });
+
+  links.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      setActive(e.currentTarget);
+    });
   });
-  // set active based on hash or default to profile
-  let initial = document.querySelector('.settings-sidebar a[href="'+location.hash+'"]');
-  if(!initial) initial = document.querySelector('.settings-sidebar a[href="#profile"]');
-  if(initial) setActive(initial);
+
+  let initial = document.querySelector('.settings-sidebar a[href="' + location.hash + '"]');
+  if (!initial) initial = document.querySelector('.settings-sidebar a[href="#profile"]');
+  if (initial) setActive(initial);
 });
 </script>
 
