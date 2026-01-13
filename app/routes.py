@@ -262,7 +262,7 @@ def energy_tracker():
         flash('Energy entry added.')
         return redirect(url_for('main.energy_tracker'))
 
-    # Load user's entries and goal
+    # Load user's entries
     entries = db.session.scalars(sa.select(EnergyEntry).where(EnergyEntry.user_id == current_user.id).order_by(EnergyEntry.entry_date.desc())).all()
 
     # Summarize weekly average (last 7 entries by date)
