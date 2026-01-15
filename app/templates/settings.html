@@ -3,70 +3,205 @@
 {% block title %}Settings{% endblock %}
 
 {% block content %}
-<h1>Account Settings</h1>
 
-<div class="row">
-  <div class="col-md-6">
-    <h3>Profile</h3>
-    <form method="post">
-      {{ settings_form.hidden_tag() }}
-      <div class="mb-3">
-        {{ settings_form.name.label }}
-        {{ settings_form.name(class="form-control") }}
-      </div>
-      <div class="mb-3">
-        {{ settings_form.email.label }}
-        {{ settings_form.email(class="form-control") }}
-      </div>
-      <button class="btn btn-primary" type="submit">Save Settings</button>
-    </form>
-  </div>
+<div class="settings-layout">
 
-  <div class="col-md-6">
-    <h3>Change Password</h3>
-    <form method="post">
-      {{ pwd_form.hidden_tag() }}
-      <div class="mb-3">{{ pwd_form.current_password.label }}{{ pwd_form.current_password(class='form-control') }}</div>
-      <div class="mb-3">{{ pwd_form.password.label }}{{ pwd_form.password(class='form-control') }}</div>
-      <div class="mb-3">{{ pwd_form.password2.label }}{{ pwd_form.password2(class='form-control') }}</div>
-      <button class="btn btn-warning" type="submit">Change Password</button>
-    </form>
+  <!-- Sidebar -->
+  <nav class="settings-sidebar" aria-label="Settings navigation">
+    <h1 class="mb-4">Account Settings</h1>
+    <ul>
+      <li><a href="#profile" class="active">Profile</a></li>
+      <li><a href="#general">Bookings</a></li>
+      <li><a href="#energy-tracker">Energy Tracker</a></li>
+    </ul>
+  </nav>
+
+  <div class="settings-content">
+
+    <!-- ================= PROFILE ================= -->
+    <section id="profile" class="settings-section active">
+      <div class="card">
+        <div class="card-body">
+
+          <h5 class="card-title">Profile</h5>
+
+          <!-- Update name/email -->
+          <form method="post">
+            {{ settings_form.hidden_tag() }}
+
+            <div class="mb-3">
+              {{ settings_form.name.label(class='form-label') }}
+              {{ settings_form.name(class='form-control') }}
+            </div>
+
+            <div class="mb-3">
+              {{ settings_form.email.label(class='form-label') }}
+              {{ settings_form.email(class='form-control') }}
+            </div>
+
+            <div class="d-flex gap-2 mb-4">
+              <button class="btn btn-primary" type="submit">Save profile</button>
+              <a href="{{ url_for('main.settings') }}" class="btn btn-outline-secondary">Reset</a>
+            </div>
+          </form>
+
+          <hr>
+
+          <!-- Change password -->
+          <form method="post">
+            {{ pwd_form.hidden_tag() }}
+
+            <h6 class="mb-3">Change password</h6>
+
+            <div class="mb-3">
+              {{ pwd_form.current_password.label(class='form-label') }}
+              {{ pwd_form.current_password(class='form-control') }}
+            </div>
+
+            <div class="mb-3">
+              {{ pwd_form.password.label(class='form-label') }}
+              {{ pwd_form.password(class='form-control') }}
+            </div>
+
+            <div class="mb-3">
+              {{ pwd_form.password2.label(class='form-label') }}
+              {{ pwd_form.password2(class='form-control') }}
+            </div>
+
+            <button class="btn btn-warning" type="submit">Update password</button>
+          </form>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= BOOKINGS ================= -->
+    <section id="general" class="settings-section">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Your bookings & consultations</h5>
+
+          {% if bookings %}
+            <div class="list-group">
+              {% for b in bookings %}
+                {% if b.user_id == current_user.id %}
+                  <div class="list-group-item d-flex justify-content-between align-items-start">
+                    <div class="me-3">
+                      <div class="fw-semibold">{{ b.name }}</div>
+                      <div class="text-muted small">{{ b.appointment_datetime.strftime('%A %d %B %Y, %H:%M') }}</div>
+                      {% if b.type %}
+                        <div class="text-muted small">{{ b.type }}</div>
+                      {% endif %}
+                      {% if b.notes %}
+                        <div class="mt-2 small">{{ b.notes }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="btn-group btn-group-sm" role="group">
+                      <a href="{{ url_for('main.reschedule_booking', booking_id=b.id) }}" class="btn btn-outline-primary">
+                        Edit time
+                      </a>
+                      <form action="{{ url_for('main.cancel_booking', booking_id=b.id) }}" method="post">
+                        <button class="btn btn-danger" type="submit">Cancel</button>
+                      </form>
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-muted mb-0">You have no upcoming bookings or consultations.</p>
+          {% endif %}
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= ENERGY TRACKER ================= -->
+    <section id="energy-tracker" class="settings-section">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Energy Tracker</h5>
+
+          {% if energy_dates %}
+            <canvas id="energyChart" height="150"></canvas>
+          {% else %}
+            <p class="text-muted mb-0">No energy entries found.</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
   </div>
 </div>
 
-<hr>
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const ctx = document.getElementById('energyChart');
+  if(ctx){
+    const data = {
+      labels: {{ energy_dates|tojson|safe }},
+      datasets: [{
+        label: 'kWh used',
+        data: {{ energy_kwh|tojson|safe }},
+        fill: false,
+        borderColor: '#1a73e8',
+        backgroundColor: '#1a73e8',
+        tension: 0.2
+      }]
+    };
 
-<h3>Contact Support</h3>
-<form method="post">
-  {{ support_form.hidden_tag() }}
-  <div class="mb-3">{{ support_form.subject.label }}{{ support_form.subject(class='form-control') }}</div>
-  <div class="mb-3">{{ support_form.message.label }}{{ support_form.message(class='form-control') }}</div>
-  <button class="btn btn-secondary" type="submit">Send</button>
-</form>
+    const config = {
+      type: 'line',
+      data: data,
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: true },
+          tooltip: { mode: 'index', intersect: false }
+        },
+        scales: {
+          x: { title: { display: true, text: 'Date' }, ticks: { maxRotation: 45, minRotation: 45 } },
+          y: { title: { display: true, text: 'kWh' }, beginAtZero: true }
+        }
+      }
+    };
 
-<hr>
+    new Chart(ctx, config);
+  }
+});
+</script>
 
-<h3>Your Bookings</h3>
-{% if bookings %}
-  <ul class="list-group">
-  {% for b in bookings %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-      <div>
-        <strong>{{ b.name }}</strong> — {{ b.appointment_datetime.strftime('%Y-%m-%d %H:%M') }}
-        <div>{{ b.notes }}</div>
-      </div>
-      <div>
-        <a class="btn btn-sm btn-outline-primary" href="{{ url_for('main.reschedule_booking', booking_id=b.id) }}">Reschedule</a>
-        <form action="{{ url_for('main.cancel_booking', booking_id=b.id) }}" method="post" style="display:inline">
-          <button class="btn btn-sm btn-danger" type="submit">Cancel</button>
-        </form>
-      </div>
-    </li>
-  {% endfor %}
-  </ul>
-{% else %}
-  <p>You have no bookings.</p>
-{% endif %}
+<!-- Sidebar Navigation JS -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const links = document.querySelectorAll('.settings-sidebar a');
+
+  function setActive(el) {
+    links.forEach(l => l.classList.remove('active'));
+    el.classList.add('active');
+
+    const id = el.getAttribute('href');
+    document.querySelectorAll('.settings-section').forEach(s => s.classList.remove('active'));
+    const target = document.querySelector(id);
+    if (target) target.classList.add('active');
+
+    history.replaceState(null, '', id);
+  }
+
+  links.forEach(link => {
+    link.addEventListener('click', e => {
+      e.preventDefault();
+      setActive(e.currentTarget);
+    });
+  });
+
+  let initial = document.querySelector('.settings-sidebar a[href="' + location.hash + '"]');
+  if (!initial) initial = document.querySelector('.settings-sidebar a[href="#profile"]');
+  if (initial) setActive(initial);
+});
+</script>
 
 <hr>
 
