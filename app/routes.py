@@ -164,8 +164,6 @@ def consultation():
     # --- Render page ---
     return render_template('consultation.html', form=form)
 
-
-
 @bp.route('/energy_tracker', methods=['GET', 'POST'])
 @login_required
 def energy_tracker():

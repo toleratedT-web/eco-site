@@ -8,7 +8,7 @@ from app import db
 from app.models import User
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField, SelectField, FileField
-from wtforms.validators import  NumberRange
+from wtforms.validators import NumberRange
 from flask_wtf.file import FileAllowed
 
 
@@ -20,8 +20,8 @@ class LoginForm(FlaskForm):
 
 class FootprintForm(FlaskForm):
     name = StringField("Name", validators=[DataRequired()])
-    car_emission = FloatField("Distance Travelled (km)", validators=[InputRequired()])  # Corrected here
-    electricity_usage = FloatField("Electricity Usage (kWh)", validators=[InputRequired()])  # Corrected here
+    car_emission = FloatField("Distance Travelled (km)", validators=[InputRequired(), NumberRange(min=0)])
+    electricity_usage = FloatField("Electricity Usage (kWh)", validators=[InputRequired(), NumberRange(min=0, max=10000)])
     date = DateField('Date', validators=[DataRequired()])
     submit = SubmitField("Submit")
 
