@@ -1,0 +1,23 @@
+Review Checklist
+
+Reviewer name, date, repository name
+
+
+
+Checklist categories:​
+
+
+
+Project information (repo, reviewer, date)​
+
+Efficiency issues found​ (Space to note file/line numbers and issues)
+
+Commenting quality assessment​
+
+Alternative solutions suggested​
+
+Code structure observations​
+
+Security concerns​
+
+Overall rating (Summary rating and key recommendations​)
