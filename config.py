@@ -1,10 +1,17 @@
 import os
+import sys
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'fallbacksecretkey')
 
-    # Ensure the database is SQLite
-    INSTANCE_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance')
+    # Determine if running as bundled executable
+    if getattr(sys, 'frozen', False):
+        # Running as executable - use AppData for database
+        INSTANCE_FOLDER = os.path.join(os.path.expanduser('~'), 'AppData', 'Local', 'eco-site')
+    else:
+        # Running in development - use project instance folder
+        INSTANCE_FOLDER = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'instance')
+    
     if not os.path.exists(INSTANCE_FOLDER):
         os.makedirs(INSTANCE_FOLDER)
 
