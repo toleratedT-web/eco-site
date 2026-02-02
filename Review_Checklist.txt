@@ -10,7 +10,7 @@ Checklist categories:​
 
 Project information (repo, reviewer, date)​
 
-Efficiency issues found​ (Space to note file/line numbers and issues)
+Efficiency issues found​ (table with: file|Line|Issue Description|Severity)
 
 Commenting quality assessment​
 
@@ -21,3 +21,11 @@ Code structure observations​
 Security concerns​
 
 Overall rating (Summary rating and key recommendations​)
+
+
+Checklist:
+ Are function/method headers clear and descriptive?
+ Are complex logic areas well‑commented?
+ Are comments accurate and up to date?
+ Is the README sufficient for setup and usage?
+ Are docstrings present where needed?
